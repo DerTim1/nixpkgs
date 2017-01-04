@@ -2,6 +2,7 @@
 { fetchurl, stdenv, python, go, cmake, vim, vimUtils, perl, ruby, unzip
 , which, fetchgit, llvmPackages
 , xkb_switch, rustracerd, fzf
+, python3, boost, icu
 , Cocoa ? null
 }:
 
@@ -303,16 +304,14 @@ rec {
   };
 
   ctrlp-cmatcher = buildVimPluginFrom2Nix { # created by nix#NixDerivation
-    name = "ctrlp-cmatcher-2016-09-22";
+    name = "ctrlp-cmatcher-2015-10-15";
     src = fetchgit {
       url = "git://github.com/JazzCore/ctrlp-cmatcher";
       rev = "6c36334f106b6fd981d23e724e9a618734cab43a";
       sha256 = "1573kd6xf3n8sxlz2j4zadai4rnc7k3s9c54648yfzickwn57d8q";
     };
     dependencies = [];
-
     buildInputs = [ python ];
-
     buildPhase = ''
       patchShebangs .
       ./install.sh
@@ -1040,6 +1039,17 @@ rec {
 
   };
 
+  vim-markdown = buildVimPluginFrom2Nix { # created by nix#NixDerivation
+    name = "vim-markdown-2016-05-19";
+    src = fetchgit {
+      url = "git://github.com/plasticboy/vim-markdown";
+      rev = "a3169545f330ec8080244c3ad755bb2211eca8a0";
+      sha256 = "1ycqx280xpc5gvfx8rrnmkqlv8q8g51hgiryx6yvd9a8ci805cx1";
+    };
+    dependencies = [];
+
+  };
+
   vim-racer = buildVimPluginFrom2Nix { # created by nix#NixDerivation
     name = "vim-racer-2016-10-18";
     src = fetchgit {
@@ -1299,16 +1309,17 @@ rec {
     dependencies = [];
     buildInputs = [
       python go cmake
-      (if stdenv.isDarwin then llvmPackages.clang else llvmPackages.clang-unwrapped)
-      llvmPackages.llvm
     ] ++ stdenv.lib.optional stdenv.isDarwin Cocoa;
 
     propagatedBuildInputs = stdenv.lib.optional (!stdenv.isDarwin) rustracerd;
 
     patches = [
-      ./patches/youcompleteme/1-top-cmake.patch
       ./patches/youcompleteme/2-ycm-cmake.patch
     ];
+
+    # YCM requires path to external libclang 3.9
+    # For explicit use and as env variable for ../third_party/ycmd/build.py
+    EXTRA_CMAKE_ARGS="-DEXTERNAL_LIBCLANG_PATH=${llvmPackages.clang.cc}/lib/libclang.${if stdenv.isDarwin then "dylib" else "so"}";
 
     buildPhase = ''
       patchShebangs .
@@ -1317,9 +1328,10 @@ rec {
 
       mkdir build
       pushd build
-      cmake -G "Unix Makefiles" . ../third_party/ycmd/cpp -DPYTHON_LIBRARIES:PATH=${python}/lib/libpython2.7.so -DPYTHON_INCLUDE_DIR:PATH=${python}/include/python2.7 -DUSE_CLANG_COMPLETER=ON -DUSE_SYSTEM_LIBCLANG=ON
+      cmake -G "Unix Makefiles" . ../third_party/ycmd/cpp -DPYTHON_LIBRARIES:PATH=${python}/lib/libpython2.7.so -DPYTHON_INCLUDE_DIR:PATH=${python}/include/python2.7 -DUSE_CLANG_COMPLETER=ON \
+        $EXTRA_CMAKE_ARGS
       make ycm_core -j''${NIX_BUILD_CORES} -l''${NIX_BUILD_CORES}}
-      ${python}/bin/python ../third_party/ycmd/build.py --gocode-completer --clang-completer --system-libclang
+      ${python}/bin/python ../third_party/ycmd/build.py --gocode-completer --clang-completer
       popd
     '';
 
@@ -1501,6 +1513,23 @@ rec {
     };
     dependencies = ["vim-misc"];
 
+  };
+
+  deoplete-go = buildVimPluginFrom2Nix { # created by nix#NixDerivation
+    name = "deoplete-go-2016-11-12";
+    src = fetchgit {
+      url = "git://github.com/zchee/deoplete-go";
+      rev = "807b5536e7cebd06d0ce7b7d54c021a82774aee2";
+      sha256 = "1ragxnlzpf17f1wdy512hkz6bd673gzl16f14v78873rcyxpiw53";
+    };
+    dependencies = [];
+    buildInputs = [ python3 ]; 
+    buildPhase = ''
+      pushd ./rplugin/python3/deoplete/ujson
+      python3 setup.py build --build-base=$PWD/build --build-lib=$PWD/build
+      popd
+      find ./rplugin/ -name "ujson*.so" -exec mv -v {} ./rplugin/python3/ \;
+    '';
   };
 
   deoplete-jedi = buildVimPluginFrom2Nix { # created by nix#NixDerivation
@@ -2085,5 +2114,36 @@ rec {
 
   };
 
+  vim-jsdoc = buildVimPluginFrom2Nix { # created by nix#NixDerivation
+    name = "vim-jsdoc-2016-11-05";
+    src = fetchgit {
+      url = "git://github.com/heavenshell/vim-jsdoc";
+      rev = "45c7c7cef440a29f7bf24436640413e3d5d578ff";
+      sha256 = "0kr4p01pyrz9w7yfh50gsz6n60qvnqxsr1055hvsyx36nzw6l3za";
+    };
+    dependencies = [];
 
+  };
+
+  cpsm = buildVimPluginFrom2Nix { # created by nix#NixDerivation
+    name = "cpsm-2016-09-21";
+    src = fetchgit {
+      url = "git://github.com/nixprime/cpsm";
+      rev = "565ab53a66fa52c46d80adf6981b07f4bdffcb1d";
+      sha256 = "125gcnqrg2276sp715q924cxwjxwsv3j4m0n1zj17w9srnpn4r1k";
+    };
+    dependencies = [];
+    buildInputs = [
+      python3
+      stdenv
+      cmake
+      boost
+      icu
+    ];
+    buildPhase = ''
+      patchShebangs .
+      export PY3=ON
+      ./install.sh
+    '';
+  };
 }

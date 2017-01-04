@@ -71,6 +71,7 @@
   ./programs/environment.nix
   ./programs/fish.nix
   ./programs/freetds.nix
+  ./programs/gphoto2.nix
   ./programs/info.nix
   ./programs/java.nix
   ./programs/kbdlight.nix
@@ -133,9 +134,11 @@
   ./services/cluster/fleet.nix
   ./services/cluster/kubernetes.nix
   ./services/cluster/panamax.nix
+  ./services/computing/boinc/client.nix
   ./services/computing/torque/server.nix
   ./services/computing/torque/mom.nix
   ./services/computing/slurm/slurm.nix
+  ./services/continuous-integration/buildbot/master.nix
   ./services/continuous-integration/buildkite-agent.nix
   ./services/continuous-integration/hydra/default.nix
   ./services/continuous-integration/gitlab-runner.nix
@@ -159,6 +162,8 @@
   ./services/databases/postgresql.nix
   ./services/databases/redis.nix
   ./services/databases/riak.nix
+  ./services/databases/riak-cs.nix
+  ./services/databases/stanchion.nix
   ./services/databases/virtuoso.nix
   ./services/desktops/accountsservice.nix
   ./services/desktops/geoclue2.nix
@@ -178,6 +183,7 @@
   ./services/desktops/telepathy.nix
   ./services/development/hoogle.nix
   ./services/editors/emacs.nix
+  ./services/editors/infinoted.nix
   ./services/games/factorio.nix
   ./services/games/ghost-one.nix
   ./services/games/minecraft-server.nix
@@ -279,6 +285,7 @@
   ./services/misc/siproxd.nix
   ./services/misc/sonarr.nix
   ./services/misc/spice-vdagentd.nix
+  ./services/misc/sssd.nix
   ./services/misc/subsonic.nix
   ./services/misc/sundtek.nix
   ./services/misc/svnserve.nix
@@ -346,6 +353,7 @@
   ./services/networking/connman.nix
   ./services/networking/consul.nix
   ./services/networking/coturn.nix
+  ./services/networking/dante.nix
   ./services/networking/ddclient.nix
   ./services/networking/dhcpcd.nix
   ./services/networking/dhcpd.nix
@@ -354,6 +362,7 @@
   ./services/networking/dnsmasq.nix
   ./services/networking/ejabberd.nix
   ./services/networking/fan.nix
+  ./services/networking/fakeroute.nix
   ./services/networking/ferm.nix
   ./services/networking/firefox/sync-server.nix
   ./services/networking/firewall.nix
@@ -385,6 +394,7 @@
   ./services/networking/minidlna.nix
   ./services/networking/miniupnpd.nix
   ./services/networking/mosquitto.nix
+  ./services/networking/miredo.nix
   ./services/networking/mstpd.nix
   ./services/networking/murmur.nix
   ./services/networking/namecoind.nix
@@ -478,6 +488,7 @@
   ./services/security/torify.nix
   ./services/security/tor.nix
   ./services/security/torsocks.nix
+  ./services/system/cgmanager.nix
   ./services/system/cloud-init.nix
   ./services/system/dbus.nix
   ./services/system/kerberos.nix
@@ -519,6 +530,7 @@
   ./services/x11/colord.nix
   ./services/x11/compton.nix
   ./services/x11/unclutter.nix
+  ./services/x11/unclutter-xfixes.nix
   ./services/x11/desktop-managers/default.nix
   ./services/x11/display-managers/auto.nix
   ./services/x11/display-managers/default.nix
@@ -539,7 +551,6 @@
   ./services/x11/window-managers/fluxbox.nix
   ./services/x11/window-managers/icewm.nix
   ./services/x11/window-managers/bspwm.nix
-  ./services/x11/window-managers/bspwm-unstable.nix
   ./services/x11/window-managers/metacity.nix
   ./services/x11/window-managers/none.nix
   ./services/x11/window-managers/twm.nix
@@ -612,6 +623,7 @@
   ./virtualisation/docker.nix
   ./virtualisation/libvirtd.nix
   ./virtualisation/lxc.nix
+  ./virtualisation/lxcfs.nix
   ./virtualisation/lxd.nix
   ./virtualisation/amazon-options.nix
   ./virtualisation/openvswitch.nix
@@ -622,4 +634,6 @@
   ./virtualisation/vmware-guest.nix
   ./virtualisation/xen-dom0.nix
   ./virtualisation/xe-guest-utilities.nix
+  ./virtualisation/openstack/keystone.nix
+  ./virtualisation/openstack/glance.nix
 ]

@@ -15,11 +15,11 @@ with stdenv.lib;
 buildPythonApplication rec {
 
   name = "youtube-dl-${version}";
-  version = "2016.11.08.1";
+  version = "2017.01.02";
 
   src = fetchurl {
     url = "https://yt-dl.org/downloads/${version}/${name}.tar.gz";
-    sha256 = "95d45438254c949952127b269451da861682fb06a7ef62b5f5dc75bc40bfaeeb";
+    sha256 = "140de01ea879cdc50bc34240802d5c10231baf448d7a664e6efeb9d5efb74d5b";
   };
 
   buildInputs = [ makeWrapper zip ] ++ optional generateManPage pandoc;

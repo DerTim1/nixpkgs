@@ -11091,7 +11091,9 @@ in
     inherit (perlPackages) SGMLSpm;
   };
 
-  iptables = callPackage ../os-specific/linux/iptables { };
+  iptables = callPackage ../os-specific/linux/iptables {
+    flex = flex_2_5_35;
+  };
 
   ipset = callPackage ../os-specific/linux/ipset { };
 
@@ -11241,7 +11243,6 @@ in
     kernelPatches =
       [ kernelPatches.bridge_stp_helper
         kernelPatches.cpu-cgroup-v2."4.4"
-        kernelPatches.p9_caching_4_4
       ]
       ++ lib.optionals ((platform.kernelArch or null) == "mips")
       [ kernelPatches.mips_fpureg_emu
@@ -11258,6 +11259,7 @@ in
         # !!! 4.7 patch doesn't apply, 4.9 patch not up yet, will keep checking
         # kernelPatches.cpu-cgroup-v2."4.7"
         kernelPatches.modinst_arg_list_too_long
+        kernelPatches.p9_caching_4_9
       ]
       ++ lib.optionals ((platform.kernelArch or null) == "mips")
       [ kernelPatches.mips_fpureg_emu
@@ -11270,6 +11272,7 @@ in
     kernelPatches = [
       kernelPatches.bridge_stp_helper
       kernelPatches.modinst_arg_list_too_long
+      kernelPatches.p9_caching_4_9
     ] ++ lib.optionals ((platform.kernelArch or null) == "mips") [
       kernelPatches.mips_fpureg_emu
       kernelPatches.mips_fpu_sigill
@@ -17273,7 +17276,9 @@ in
 
   scilab-bin = callPackage ../applications/science/math/scilab-bin {};
 
-  scotch = callPackage ../applications/science/math/scotch { };
+  scotch = callPackage ../applications/science/math/scotch {
+    flex = flex_2_5_35;
+  };
 
   msieve = callPackage ../applications/science/math/msieve { };
 
@@ -17594,6 +17599,8 @@ in
     nix-prefetch-svn
     nix-prefetch-zip
     nix-prefetch-scripts;
+
+  nix-update-source = callPackage ../tools/package-management/nix-update-source {};
 
   nix-template-rpm = callPackage ../build-support/templaterpm { inherit (pythonPackages) python toposort; };
 
@@ -18038,4 +18045,6 @@ in
   simplenote = callPackage ../applications/misc/simplenote { };
 
   hy = callPackage ../development/interpreters/hy {};
+
+  ghc-standalone-archive = callPackage ../os-specific/darwin/ghc-standalone-archive { inherit (darwin) cctools; };
 }

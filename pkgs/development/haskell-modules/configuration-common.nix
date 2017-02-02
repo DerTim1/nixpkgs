@@ -1097,13 +1097,13 @@ self: super: {
   http-api-data_0_3_5 = dontCheck super.http-api-data_0_3_5;
 
   # Fix build for latest versions of servant and servant-client.
-  servant_0_9_1_1 = super.servant_0_9_1_1.overrideScope (self: super: {
+  servant_0_10 = super.servant_0_10.overrideScope (self: super: {
     http-api-data = self.http-api-data_0_3_5;
   });
-  servant-client_0_9_1_1 = super.servant-client_0_9_1_1.overrideScope (self: super: {
+  servant-client_0_10 = super.servant-client_0_10.overrideScope (self: super: {
     http-api-data = self.http-api-data_0_3_5;
-    servant-server = self.servant-server_0_9_1_1;
-    servant = self.servant_0_9_1_1;
+    servant-server = self.servant-server_0_10;
+    servant = self.servant_0_10;
   });
 
   # build servant docs from the repository
@@ -1189,6 +1189,9 @@ self: super: {
   turtle_1_3_1 = super.turtle_1_3_1.overrideScope (self: super: {
     optparse-applicative = self.optparse-applicative_0_13_0_0;
   });
+
+  # No upstream issue tracker
+  hspec-expectations-pretty-diff = dontCheck super.hspec-expectations-pretty-diff;
 
   lentil = super.lentil.overrideScope (self: super: {
     pipes = self.pipes_4_3_2;

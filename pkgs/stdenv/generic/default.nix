@@ -153,7 +153,7 @@ let
 
           b) For `nix-env`, `nix-build`, `nix-shell` or any other Nix command you can add
             { allow${up reason} = true; }
-          to ~/.nixpkgs/config.nix.
+          to ~/.config/nixpkgs/config.nix.
         ''));
 
       # Check if a derivation is valid, that is whether it passes checks for
@@ -311,6 +311,7 @@ let
              || system == "armv5tel-linux"
              || system == "armv6l-linux"
              || system == "armv7l-linux"
+             || system == "aarch64-linux"
              || system == "mips64el-linux";
       isGNU = system == "i686-gnu"; # GNU/Hurd
       isGlibc = isGNU # useful for `stdenvNative'
@@ -342,12 +343,14 @@ let
              || system == "x86_64-openbsd"
              || system == "x86_64-cygwin"
              || system == "x86_64-solaris"
+             || system == "aarch64-linux"
              || system == "mips64el-linux";
       isMips = system == "mips-linux"
             || system == "mips64el-linux";
       isArm = system == "armv5tel-linux"
            || system == "armv6l-linux"
            || system == "armv7l-linux";
+      isAarch64 = system == "aarch64-linux";
       isBigEndian = system == "powerpc-linux";
 
       # Whether we should run paxctl to pax-mark binaries.

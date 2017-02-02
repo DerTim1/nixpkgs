@@ -92,6 +92,7 @@ rec {
               # without proper `file` command, libtool sometimes fails
               # to recognize 64-bit DLLs
             ++ stdenv.lib.optional (cross.config  == "x86_64-w64-mingw32") pkgs.file
+            ++ stdenv.lib.optional (cross.config  == "aarch64-linux-gnu") pkgs.updateAutotoolsGnuConfigScriptsHook
             ;
 
           # Cross-linking dynamic libraries, every buildInput should
@@ -182,7 +183,7 @@ rec {
 
      This adapter can be defined on the defaultStdenv definition.  You can
      use it by patching the all-packages.nix file or by using the override
-     feature of ~/.nixpkgs/config.nix .
+     feature of ~/.config/nixpkgs/config.nix .
   */
   validateLicenses = licensePred: stdenv: stdenv //
     { mkDerivation = args:

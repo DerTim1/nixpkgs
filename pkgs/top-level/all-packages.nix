@@ -6907,7 +6907,7 @@ with pkgs;
 
   grabserial = callPackage ../development/tools/grabserial { };
 
-  mypy-lang = callPackage ../development/tools/mypy-lang { };
+  mypy = callPackage ../development/tools/mypy { };
 
 
   ### DEVELOPMENT / LIBRARIES
@@ -14380,7 +14380,10 @@ with pkgs;
 
   mcomix = callPackage ../applications/graphics/mcomix { };
 
-  mendeley = callPackage ../applications/office/mendeley { };
+  mendeley = callPackage ../applications/office/mendeley {
+    qt5 = qt56;
+    gconf = pkgs.gnome2.GConf;
+  };
 
   mercurial = callPackage ../applications/version-management/mercurial {
     inherit (darwin.apple_sdk.frameworks) ApplicationServices;

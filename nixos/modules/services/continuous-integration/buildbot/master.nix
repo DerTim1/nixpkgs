@@ -7,7 +7,7 @@ with lib;
 let
   cfg = config.services.buildbot-master;
   escapeStr = s: escape ["'"] s;
-  masterCfg = pkgs.writeText "master.cfg" ''
+  masterCfg = if cfg.masterCfg == null then pkgs.writeText "master.cfg" ''
     from buildbot.plugins import *
     factory = util.BuildFactory()
     c = BuildmasterConfig = dict(
@@ -27,9 +27,8 @@ let
       factory.addStep(step)
 
     ${cfg.extraConfig}
-  '';
-
-  configFile = if cfg.masterCfg == null then masterCfg else cfg.masterCfg;
+  ''
+  else cfg.masterCfg;
 
 in {
   options = {
@@ -67,15 +66,10 @@ in {
       };
 
       masterCfg = mkOption {
-        type = with types; nullOr path;
-        description = ''
-          Optionally pass path to raw master.cfg file.
-          Other options in this configuration will be ignored.
-        '';
+        type = types.nullOr types.path;
+        description = "Optionally pass master.cfg path. Other options in this configuration will be ignored.";
         default = null;
-        example = literalExample ''
-          pkgs.writeText "master.cfg" "BuildmasterConfig = c = {}"
-        '';
+        example = "/etc/nixos/buildbot/master.cfg";
       };
 
       schedulers = mkOption {
@@ -91,7 +85,7 @@ in {
         type = types.listOf types.str;
         description = "List of Builders.";
         default = [
-          "util.BuilderConfig(name='runtests',workernames=['default-worker'],factory=factory)"
+          "util.BuilderConfig(name='runtests',workernames=['example-worker'],factory=factory)"
         ];
       };
 
@@ -99,9 +93,9 @@ in {
         type = types.listOf types.str;
         description = "List of Workers.";
         default = [
-          "worker.Worker('default-worker', 'password')"
+          "worker.Worker('example-worker', 'pass')"
         ];
-        example = [ "worker.LocalWorker('default-worker')" ];
+        example = [ "worker.LocalWorker('example-worker')" ];
       };
 
       status = mkOption {
@@ -186,10 +180,7 @@ in {
       package = mkOption {
         type = types.package;
         default = pkgs.buildbot-ui;
-        description = ''
-          Package to use for buildbot.
-          <literal>buildbot-full</literal> is required in order to use local workers.
-        '';
+        description = "Package to use for buildbot.";
         example = pkgs.buildbot-full;
       };
 
@@ -209,7 +200,7 @@ in {
 
     users.extraUsers = optional (cfg.user == "buildbot") {
       name = "buildbot";
-      description = "buildbot user";
+      description = "Buildbot User.";
       isNormalUser = true;
       createHome = true;
       home = cfg.home;
@@ -219,7 +210,7 @@ in {
     };
 
     systemd.services.buildbot-master = {
-      description = "Buildbot Continuous Integration Server";
+      description = "Buildbot Continuous Integration Server.";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
       path = cfg.packages;
@@ -233,9 +224,8 @@ in {
       };
 
       preStart = ''
-        mkdir -vp ${cfg.buildbotDir}
-        chown -c ${cfg.user}:${cfg.group} ${cfg.buildbotDir}
-        ln -sf ${configFile} ${cfg.buildbotDir}/master.cfg
+        ${pkgs.coreutils}/bin/mkdir -vp ${cfg.buildbotDir}
+        ${pkgs.coreutils}/bin/ln -sfv ${masterCfg} ${cfg.buildbotDir}/master.cfg
         ${cfg.package}/bin/buildbot create-master ${cfg.buildbotDir}
       '';
 
@@ -246,5 +236,7 @@ in {
       '';
     };
   };
+
+  meta.maintainers = with lib.maintainers; [ nand0p Mic92 ];
 
 }

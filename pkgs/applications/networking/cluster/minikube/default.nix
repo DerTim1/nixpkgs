@@ -1,15 +1,18 @@
-{ stdenv, fetchurl, kubernetes }:
+{ stdenv, lib, fetchurl, makeWrapper, docker-machine-kvm, kubernetes, libvirt, qemu }:
+
 let
   arch = if stdenv.isLinux
          then "linux-amd64"
          else "darwin-amd64";
   checksum = if stdenv.isLinux
-             then "17r8w4lvj7fhh7qppi9z5i2fpqqry4s61zjr9zmsbybc5flnsw2j"
-             else "0jf0kd1mm35qcf0ydr5yyzfq6qi8ifxchvpjsydb1gm1kikp5g3p";
-in
-stdenv.mkDerivation rec {
+             then "0cdcabsx5l4jbpyj3zzyz5bnzks6wl64bmzdsnk41x92ar5y5yal"
+             else "12f3b7s5lwpvzx4wj6i6h62n4zjshqf206fxxwpwx9kpsdaw6xdi";
+
+# TODO: compile from source
+
+in stdenv.mkDerivation rec {
   pname = "minikube";
-  version = "0.13.1";
+  version = "0.17.1";
   name = "${pname}-${version}";
 
   src = fetchurl {
@@ -17,29 +20,28 @@ stdenv.mkDerivation rec {
     sha256 = "${checksum}";
   };
 
-  buildInputs = [ ];
+  phases = [ "installPhase" "fixupPhase" ];
 
-  propagatedBuildInputs = [ kubernetes ];
+  buildInputs = [ makeWrapper ];
 
-  phases = [ "buildPhase" "installPhase" ];
-
-  buildPhase = ''
-    mkdir -p $out/bin
-  '';
+  binPath = lib.makeBinPath [ docker-machine-kvm kubernetes libvirt qemu ];
 
   installPhase = ''
-    cp $src $out/bin/${pname}
-    chmod +x $out/bin/${pname}
+    install -Dm755 ${src} $out/bin/${pname}
+  '';
 
-    mkdir -p $out/share/bash-completion/completions/
-    HOME=$(pwd) $out/bin/minikube completion bash > $out/share/bash-completion/completions/minikube
+  fixupPhase = ''
+    patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" "$out/bin/minikube"
+
+    wrapProgram $out/bin/${pname} \
+      --prefix PATH : ${binPath}
   '';
 
   meta = with stdenv.lib; {
     homepage = https://github.com/kubernetes/minikube;
     description = "A tool that makes it easy to run Kubernetes locally";
     license = licenses.asl20;
-    maintainers = [ maintainers.ebzzry ];
-    platforms = platforms.linux ++ platforms.darwin;
+    maintainers = with maintainers; [ ebzzry ];
+    platforms = with platforms; linux ++ darwin;
   };
 }

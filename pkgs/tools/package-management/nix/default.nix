@@ -21,7 +21,7 @@ let
 
     buildInputs = [ curl openssl sqlite xz ]
       ++ lib.optional (stdenv.isLinux || stdenv.isDarwin) libsodium
-      ++ lib.optional (stdenv.isLinux && lib.versionAtLeast version "1.12pre")
+      ++ lib.optional ((stdenv.isLinux || stdenv.isDarwin) && lib.versionAtLeast version "1.12pre")
           (aws-sdk-cpp.override {
             apis = ["s3"];
             customMemoryManagement = false;
@@ -103,21 +103,21 @@ in rec {
   nix = nixStable;
 
   nixStable = common rec {
-    name = "nix-1.11.5";
+    name = "nix-1.11.7";
     src = fetchurl {
       url = "http://nixos.org/releases/nix/${name}/${name}.tar.xz";
-      sha256 = "272361d091c735b0e80627fa23fb7c600957472301dd7e54d237069452f3addb";
+      sha256 = "1a6fd2a23f5fde614c3937c0d51eff46d28dd30d245a66d34d59b15fd9bb8f2d";
     };
   };
 
   nixUnstable = lib.lowPrio (common rec {
     name = "nix-1.12${suffix}";
-    suffix = "pre4911_b30d1e7";
+    suffix = "pre5073_1cf4801";
     src = fetchFromGitHub {
       owner = "NixOS";
       repo = "nix";
-      rev = "b30d1e7ada0a8fbaacc25e24e5e788d18bfe8d3c";
-      sha256 = "04j6aw2bi3k7m5jyqwn1vrf78br5kdfpjsj15b5r5lvxdqhlknvm";
+      rev = "1cf480110879ffc8aee94b4b75999da405b71d7c";
+      sha256 = "1iwpddz0yni7cz2g9asj6nmrwhaai3rhfmkq954hph8nx02c3l02";
     };
     fromGit = true;
   });

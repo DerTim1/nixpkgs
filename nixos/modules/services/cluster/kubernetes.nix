@@ -737,6 +737,8 @@ in {
         wantedBy = [ "multi-user.target" ];
         after = [ "kube-apiserver.service" ];
         serviceConfig = {
+          RestartSec = "30s";
+          Restart = "on-failure";
           ExecStart = ''${cfg.package}/bin/kube-controller-manager \
             --address=${cfg.controllerManager.address} \
             --port=${toString cfg.controllerManager.port} \
@@ -773,7 +775,7 @@ in {
             --bind-address=${cfg.proxy.address} \
             ${optionalString cfg.verbose "--v=6"} \
             ${optionalString cfg.verbose "--log-flush-frequency=1s"} \
-            ${cfg.controllerManager.extraOpts}
+            ${cfg.proxy.extraOpts}
           '';
           WorkingDirectory = cfg.dataDir;
         };

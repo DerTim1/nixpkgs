@@ -18,7 +18,7 @@ let
       };
     };
 
-  grsecPatch = { grbranch ? "test", grver ? "3.1", kver, grrev, sha256 }: rec {
+  grsecPatch = { grbranch ? "test", grver ? "3.1", kver, grrev, sha512 }: rec {
     name = "grsecurity-${grver}-${kver}-${grrev}";
 
     # Pass these along to allow the caller to determine compatibility
@@ -30,9 +30,9 @@ let
         # When updating versions/hashes, ALWAYS use the official
         # version; we use this mirror only because upstream removes
         # source files immediately upon releasing a new version ...
-        "https://raw.githubusercontent.com/slashbeast/grsecurity-scrape/master/${grbranch}/${name}.patch"
+        "https://raw.githubusercontent.com/slashbeast/grsecurity-scrape/master/${grbranch}/${kver}/${name}.patch"
       ];
-      inherit sha256;
+      inherit sha512;
     };
 
     features.grsecurity = true;
@@ -95,9 +95,9 @@ rec {
   };
 
   grsecurity_testing = grsecPatch
-    { kver   = "4.8.15";
-      grrev  = "201612301949";
-      sha256 = "1083r30ipvdi3kjixlsp3f1mmf7848f2p32ds956caarvr4vkm3b";
+    { kver   = "4.9.13";
+      grrev  = "201703052141";
+      sha512 = "197n21975ifp2nkpl6d7v3r9fllw2l7pyd2h8cic7dnigy65a5jqx1sxhqryivijx3czf6hj173q999j218ihlg15p6a7aqjhkh90kf";
     };
 
   # This patch relaxes grsec constraints on the location of usermode helpers,
@@ -175,13 +175,12 @@ rec {
       };
     };
 
-  p9_caching_4_4 = rec
-    { name = "9p-caching.patch";
+  DCCP_double_free_vulnerability_CVE-2017-6074 = rec
+    { name = "DCCP_double_free_vulnerability_CVE-2017-6074.patch";
       patch = fetchpatch {
         inherit name;
-        url = https://github.com/edolstra/linux/commit/d522582553368b9564e2d88a8d7b1d469bf98c65.patch;
-        sha256 = "01h7461pdgavd6ghd6w9wg136hkaca0mrmmzhy6s3phksksimbc2";
+        url = "https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/patch/?id=5edabca9d4cff7f1f2b68f0bac55ef99d9798ba4";
+        sha256 = "10dmv3d3gj8rvj9h40js4jh8xbr5wyaqiy0kd819mya441mj8ll2";
       };
     };
-
 }

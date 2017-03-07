@@ -21,7 +21,7 @@ with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "erlang-" + version + "${optionalString odbcSupport "-odbc"}"
   + "${optionalString javacSupport "-javac"}";
-  version = "19.1.6";
+  version = "19.2.3";
 
   # Minor OTP releases are not always released as tarbals at
   # http://erlang.org/download/ So we have to download from
@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
     owner = "erlang";
     repo = "otp";
     rev = "OTP-${version}";
-    sha256 = "120dqi8h2fwqfmh9g2nmkf153zlglzw9kkddz57xqvqq5arcs72y";
+    sha256 = "1lsmjpz2g4hj44fz95w7sswzj40iv7jq5jk64x0095lhvxmlf57c";
   };
 
   buildInputs =
@@ -42,6 +42,11 @@ stdenv.mkDerivation rec {
       ++ stdenv.lib.optionals stdenv.isDarwin [ Carbon Cocoa ];
 
   debugInfo = enableDebugInfo;
+
+  prePatch = ''
+    substituteInPlace configure.in \
+      --replace '`sw_vers -productVersion`' '10.10'
+  '';
 
   preConfigure = ''
     ./otp_build autoconf

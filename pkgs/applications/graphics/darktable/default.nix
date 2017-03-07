@@ -11,12 +11,12 @@
 assert stdenv ? glibc;
 
 stdenv.mkDerivation rec {
-  version = "2.2.0";
+  version = "2.2.3";
   name = "darktable-${version}";
 
   src = fetchurl {
     url = "https://github.com/darktable-org/darktable/releases/download/release-${version}/darktable-${version}.tar.xz";
-    sha256 = "3eca193831faae58200bb1cb6ef29e658bce43a81706b54420953a7c33d79377";
+    sha256 = "1b33859585bf283577680c61e3c0ea4e48214371453b9c17a86664d2fbda48a0";
   };
 
   buildInputs =
@@ -43,7 +43,7 @@ stdenv.mkDerivation rec {
       --prefix LD_LIBRARY_PATH ":" "$out/lib/darktable"
     )
   '';
-  
+
   meta = with stdenv.lib; {
     description = "Virtual lighttable and darkroom for photographers";
     homepage = https://www.darktable.org;

@@ -1,19 +1,19 @@
 # This script was inspired by the ArchLinux User Repository package:
 #
 #   https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=oh-my-zsh-git
-
-
 { stdenv, fetchgit }:
 
 stdenv.mkDerivation rec {
+  version = "2017-02-20";
   name = "oh-my-zsh-${version}";
-  version = "2016-12-14";
 
   src = fetchgit {
     url = "https://github.com/robbyrussell/oh-my-zsh";
-    rev = "67dad45b38b7f0bafcaf7679da6eb4596301843b";
-    sha256 = "1adgj0p4c8aq9rpkv33k8ra69922vfkjw63b666i66v6zr0s8znp";
+    rev = "98d8d3429f8b9fc2c4c109fb199a31c8d1735699";
+    sha256 = "1zdjb5dsbr8n7jfmib4a6rhcx9wrp5lw4b8b9xrh164s97hza2d0";
   };
+
+  pathsToLink = [ "/share/oh-my-zsh" ];
 
   phases = "installPhase";
 

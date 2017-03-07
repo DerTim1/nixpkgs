@@ -23,11 +23,11 @@
 let
   # NOTE: When updating, please also update in current stable,
   # as older versions stop working
-  version = "16.4.30";
+  version = "20.4.19";
   sha256 =
     {
-      "x86_64-linux" = "0inwc12d14i6gyfllxbhizb434a7vy0l5nvc07kz0bca7c4665wb";
-      "i686-linux"   = "0pdn8558ll317k3jrrjir90pn6abwbm99y9wzdq39wxj4dmrlh6w";
+      "x86_64-linux" = "1970zrvk2pbs7fa7q4rqc8c1vvsvcris8ybnihazh5pqii91s16l";
+      "i686-linux"   = "1p3fdjrin5v9ifz6lba1pvb2pw3nmsiqq0jp56vgdk5jzmky23km";
     }."${stdenv.system}" or (throw "system ${stdenv.system} not supported");
 
   arch =
@@ -146,6 +146,8 @@ in stdenv.mkDerivation {
             fi
         fi
     done
+
+    paxmark m $out/${appdir}/dropbox
   '';
 
   meta = {

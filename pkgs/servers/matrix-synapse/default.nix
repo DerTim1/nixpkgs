@@ -11,26 +11,26 @@ let
   };
   matrix-synapse-ldap3 = pythonPackages.buildPythonApplication rec {
     name = "matrix-synapse-ldap3-${version}";
-    version = "0.1.1";
+    version = "0.1.2";
 
     src = fetchFromGitHub {
       owner = "matrix-org";
       repo = "matrix-synapse-ldap3";
-      rev = "564eb3f109ce7f1082c47d5f8efaa792d90467f1";
-      sha256 = "1mkjlvy7a3rq405m59ihkh1wq7pa4l03fp8hgwwyjnbmz25bqmbk";
+      rev = "v${version}";
+      sha256 = "16pivz1lhs1c3z84rxxy8khyvn0hqxwxaz552br1y9ri0maa0aq8";
     };
 
     propagatedBuildInputs = with pythonPackages; [ service-identity ldap3 twisted ];
   };
 in pythonPackages.buildPythonApplication rec {
   name = "matrix-synapse-${version}";
-  version = "0.18.6-rc2";
+  version = "0.19.2";
 
   src = fetchFromGitHub {
     owner = "matrix-org";
     repo = "synapse";
     rev = "v${version}";
-    sha256 = "0alsby8hghhzgpzism2f9v5pmz91v20bd18nflfka79f3ss03h0q";
+    sha256 = "03gnz7rb7yncykqy0irl1y5lhk1cs0b4snpas8s1c9r0vsw1bmhr";
   };
 
   patches = [ ./matrix-synapse.patch ];

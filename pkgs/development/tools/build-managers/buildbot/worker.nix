@@ -1,23 +1,26 @@
-{ stdenv, fetchurl, pythonPackages }:
+{ stdenv, fetchurl, gnused, coreutils, pythonPackages }:
 
 pythonPackages.buildPythonApplication (rec {
   name = "${pname}-${version}";
   pname = "buildbot-worker";
-  version = "0.9.0.post1";
+  version = "0.9.4";
 
   src = fetchurl {
     url = "mirror://pypi/b/${pname}/${name}.tar.gz";
-    sha256 = "1f8ij3y62r9z7qv92x21rg9h9whhakkwv59rgniq09j64ggjz8lx";
+    sha256 = "0rdrr8x7sn2nxl51p6h9ad42s3c28lb6sys84zrg0d7fm4zhv7hj";
   };
 
   buildInputs = with pythonPackages; [ setuptoolsTrial mock ];
   propagatedBuildInputs = with pythonPackages; [ twisted future ];
 
+  postPatch = ''
+    ${gnused}/bin/sed -i 's|/usr/bin/tail|${coreutils}/bin/tail|' buildbot_worker/scripts/logwatcher.py
+  '';
+
   meta = with stdenv.lib; {
     homepage = http://buildbot.net/;
     description = "Buildbot Worker Daemon";
     maintainers = with maintainers; [ nand0p ryansydnor ];
-    platforms = platforms.all;
     license = licenses.gpl2;
   };
 })

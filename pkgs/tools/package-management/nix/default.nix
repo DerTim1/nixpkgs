@@ -1,5 +1,5 @@
 { lib, stdenv, fetchurl, fetchFromGitHub, perl, curl, bzip2, sqlite, openssl ? null, xz
-, pkgconfig, boehmgc, perlPackages, libsodium, aws-sdk-cpp
+, pkgconfig, boehmgc, perlPackages, libsodium, aws-sdk-cpp, brotli
 , autoreconfHook, autoconf-archive, bison, flex, libxml2, libxslt, docbook5, docbook5_xsl
 , storeDir ? "/nix/store"
 , stateDir ? "/nix/var"
@@ -7,8 +7,8 @@
 
 let
 
-  common = { name, suffix ? "", src, fromGit ? false }: stdenv.mkDerivation rec {
-    inherit name src;
+  common = { name, suffix ? "", src, patchPhase ? "", fromGit ? false }: stdenv.mkDerivation rec {
+    inherit name src patchPhase;
     version = lib.getVersion name;
 
     VERSION_SUFFIX = lib.optionalString fromGit suffix;
@@ -16,11 +16,13 @@ let
     outputs = [ "out" "dev" "man" "doc" ];
 
     nativeBuildInputs =
-      [ perl pkgconfig ]
+      [ pkgconfig ]
+      ++ lib.optionals (!lib.versionAtLeast version "1.12pre") [ perl ]
       ++ lib.optionals fromGit [ autoreconfHook autoconf-archive bison flex libxml2 libxslt docbook5 docbook5_xsl ];
 
     buildInputs = [ curl openssl sqlite xz ]
       ++ lib.optional (stdenv.isLinux || stdenv.isDarwin) libsodium
+      ++ lib.optional fromGit brotli # Since 1.12
       ++ lib.optional ((stdenv.isLinux || stdenv.isDarwin) && lib.versionAtLeast version "1.12pre")
           (aws-sdk-cpp.override {
             apis = ["s3"];
@@ -42,12 +44,12 @@ let
       [ "--with-store-dir=${storeDir}"
         "--localstatedir=${stateDir}"
         "--sysconfdir=/etc"
-        "--with-dbi=${perlPackages.DBI}/${perl.libPrefix}"
-        "--with-dbd-sqlite=${perlPackages.DBDSQLite}/${perl.libPrefix}"
         "--disable-init-state"
         "--enable-gc"
       ]
-      ++ lib.optional (!lib.versionAtLeast version "1.12pre") [
+      ++ lib.optionals (!lib.versionAtLeast version "1.12pre") [
+        "--with-dbi=${perlPackages.DBI}/${perl.libPrefix}"
+        "--with-dbd-sqlite=${perlPackages.DBDSQLite}/${perl.libPrefix}"
         "--with-www-curl=${perlPackages.WWWCurl}/${perl.libPrefix}"
       ];
 
@@ -96,30 +98,61 @@ let
       maintainers = [ stdenv.lib.maintainers.eelco ];
       platforms = stdenv.lib.platforms.all;
     };
+
+    passthru = { inherit fromGit; };
+  };
+
+  perl-bindings = { nix }: stdenv.mkDerivation {
+    name = "nix-perl-" + nix.version;
+
+    inherit (nix) src;
+
+    postUnpack = "sourceRoot=$sourceRoot/perl";
+
+    nativeBuildInputs =
+      [ perl pkgconfig curl nix libsodium ]
+      ++ lib.optionals nix.fromGit [ autoreconfHook autoconf-archive ];
+
+    configureFlags =
+      [ "--with-dbi=${perlPackages.DBI}/${perl.libPrefix}"
+        "--with-dbd-sqlite=${perlPackages.DBDSQLite}/${perl.libPrefix}"
+        "--with-www-curl=${perlPackages.WWWCurl}/${perl.libPrefix}"
+      ];
+
+    preBuild = "unset NIX_INDENT_MAKE";
   };
 
 in rec {
 
   nix = nixStable;
 
-  nixStable = common rec {
-    name = "nix-1.11.7";
+  nixStable = (common rec {
+    name = "nix-1.11.9";
     src = fetchurl {
       url = "http://nixos.org/releases/nix/${name}/${name}.tar.xz";
-      sha256 = "1a6fd2a23f5fde614c3937c0d51eff46d28dd30d245a66d34d59b15fd9bb8f2d";
+      sha256 = "0e943e277f37843f9196b0293cc31d828613ad7a328ee77cd5be01935dc6e7e1";
     };
-  };
 
-  nixUnstable = lib.lowPrio (common rec {
+    # Until 1.11.9 is released, we do this :)
+    patchPhase = ''
+      substituteInPlace src/libexpr/json-to-value.cc \
+        --replace 'std::less<Symbol>, gc_allocator<Value *>' \
+                  'std::less<Symbol>, gc_allocator<std::pair<const Symbol, Value *> >'
+
+      sed -i '/if (settings.readOnlyMode) {/a curSchema = getSchema();' src/libstore/local-store.cc
+    '';
+  }) // { perl-bindings = nixStable; };
+
+  nixUnstable = (lib.lowPrio (common rec {
     name = "nix-1.12${suffix}";
-    suffix = "pre5073_1cf4801";
+    suffix = "pre5152_915f62fa";
     src = fetchFromGitHub {
       owner = "NixOS";
       repo = "nix";
-      rev = "1cf480110879ffc8aee94b4b75999da405b71d7c";
-      sha256 = "1iwpddz0yni7cz2g9asj6nmrwhaai3rhfmkq954hph8nx02c3l02";
+      rev = "915f62fa19790d8f826aeb4dd3d2bb5bde2f67e9";
+      sha256 = "0mf7y7hvzw2x5dp482qy8774djr3vzcjaqq58cp82zdil8l7kwjd";
     };
     fromGit = true;
-  });
+  })) // { perl-bindings = perl-bindings { nix = nixUnstable; }; };
 
 }

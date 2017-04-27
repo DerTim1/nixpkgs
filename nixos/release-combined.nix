@@ -92,8 +92,9 @@ in rec {
         (all nixos.tests.openssh)
         (all nixos.tests.printing)
         (all nixos.tests.proxy)
-        (all nixos.tests.sddm)
+        (all nixos.tests.sddm.default)
         (all nixos.tests.simple)
+        (all nixos.tests.slim)
         (all nixos.tests.udisks2)
         (all nixos.tests.xfce)
 

@@ -239,6 +239,12 @@ in
           menuentry "Windows 7" {
             chainloader (hd0,4)+1
           }
+
+          # GRUB 2 with UEFI example, chainloading another distro
+          menuentry "Fedora" {
+            set root=(hd1,1)
+            chainloader /efi/fedora/grubx64.efi
+          }
         '';
         description = ''
           Any additional entries you want added to the GRUB boot menu.
@@ -381,7 +387,6 @@ in
 
       efiInstallAsRemovable = mkOption {
         default = false;
-        example = true;
         type = types.bool;
         description = ''
           Whether to invoke <literal>grub-install</literal> with

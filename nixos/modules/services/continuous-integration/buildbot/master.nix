@@ -118,7 +118,7 @@ in {
 
       extraGroups = mkOption {
         type = types.listOf types.str;
-        default = [ "nixbld" ];
+        default = [];
         description = "List of extra groups that the buildbot user should be a part of.";
       };
 
@@ -180,13 +180,14 @@ in {
       package = mkOption {
         type = types.package;
         default = pkgs.buildbot-ui;
+        defaultText = "pkgs.buildbot-ui";
         description = "Package to use for buildbot.";
-        example = pkgs.buildbot-full;
+        example = literalExample "pkgs.buildbot-full";
       };
 
       packages = mkOption {
         default = [ ];
-        example = [ pkgs.git ];
+        example = literalExample "[ pkgs.git ]";
         type = types.listOf types.package;
         description = "Packages to add to PATH for the buildbot process.";
       };
@@ -216,11 +217,11 @@ in {
       path = cfg.packages;
 
       serviceConfig = {
-        Type = "forking";
+        Type = "simple";
         User = cfg.user;
         Group = cfg.group;
         WorkingDirectory = cfg.home;
-        ExecStart = "${cfg.package}/bin/buildbot start ${cfg.buildbotDir}";
+        ExecStart = "${cfg.package}/bin/buildbot start --nodaemon ${cfg.buildbotDir}";
       };
 
       preStart = ''

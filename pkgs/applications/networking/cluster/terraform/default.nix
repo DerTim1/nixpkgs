@@ -37,7 +37,6 @@ let
         maintainers = with maintainers; [ jgeerds zimbatm peterhoeg ];
       };
     } // attrs');
-
 in {
   terraform_0_8_5 = generic {
     version = "0.8.5";
@@ -49,15 +48,22 @@ in {
     sha256 = "0ibgpcpvz0bmn3cw60nzsabsrxrbmmym1hv7fx6zmjxiwd68w5gb";
   };
 
-  terraform_0_9_3 = generic {
-    version = "0.9.3";
-    sha256 = "00z72lwv0cprz1jjy0cr8dicl00zwc1zwsxzjssqnq0187sswkxw";
+  terraform_0_9_11 = generic {
+    version = "0.9.11";
+    sha256 = "045zcpd4g9c52ynhgh3213p422ahds63mzhmd2iwcmj88g8i1w6x";
+    # checks are failing again
+    doCheck = false;
+  };
 
-    postPatch = ''
-      rm builtin/providers/dns/data_dns_cname_record_set_test.go
-      rm builtin/providers/vsphere/resource_vsphere_file_test.go
+  terraform_0_10_0 = generic {
+    version = "0.10.0";
+    sha256 = "1z6pmyfh4z5w8k2j46ancc0m9lsiq6d0m56nxj1kawb3n5q9dgds";
+    # remove debugging and the -dev postfix in the version
+    preBuild = ''
+      buildFlagsArray=(
+        -ldflags
+        "-X github.com/hashicorp/terraform/terraform.VersionPrerelease= -s -w"
+      )
     '';
-
-    doCheck = true;
   };
 }

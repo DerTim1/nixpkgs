@@ -1,25 +1,30 @@
-{ stdenv, fetchurl, unzip }:
+{ stdenv
+, dpkg
+, fetchurl
+, unzip
+}:
 
 stdenv.mkDerivation rec {
   name = "unifi-controller-${version}";
-  version = "5.4.14";
+  version = "5.5.20";
 
   src = fetchurl {
-    url = "https://dl.ubnt.com/unifi/${version}/UniFi.unix.zip";
-    sha256 = "16scryd8g0dsswawwadxxqsirir6mn0jaawv3qcszqj52vlz878w";
+    url = "https://www.ubnt.com/downloads/unifi/${version}/unifi_sysvinit_all.deb";
+    sha256 = "14v38x46vgwm3wg28lzv4sz6kjgp6r1xkwxnxn6pzq2r7v6xkaz0";
   };
 
-  buildInputs = [ unzip ];
+  buildInputs = [ dpkg ];
+
+  unpackPhase = ''
+    dpkg-deb -x ${src} ./
+  '';
 
   doConfigure = false;
 
-  buildPhase = ''
-    rm -rf bin conf readme.txt
-  '';
-
   installPhase = ''
     mkdir -p $out
-    cp -ar * $out
+    cd ./usr/lib/unifi
+    cp -ar dl lib webapps $out
   '';
 
   meta = with stdenv.lib; {

@@ -52,8 +52,11 @@ let
     let
 
       thisStdenv = import ../generic {
-        inherit system config extraBuildInputs;
         name = "stdenv-linux-boot";
+        buildPlatform = localSystem;
+        hostPlatform = localSystem;
+        targetPlatform = localSystem;
+        inherit config extraBuildInputs;
         preHook =
           ''
             # Don't patch #!/interpreter because it leads to retained
@@ -73,6 +76,11 @@ let
              else lib.makeOverridable (import ../../build-support/cc-wrapper) {
           nativeTools = false;
           nativeLibc = false;
+          buildPackages = lib.optionalAttrs (prevStage ? stdenv) {
+            inherit (prevStage) stdenv;
+          };
+          hostPlatform = localSystem;
+          targetPlatform = localSystem;
           cc = prevStage.gcc-unwrapped;
           isGNU = true;
           libc = prevStage.glibc;
@@ -94,9 +102,6 @@ let
       };
 
     in {
-      buildPlatform = localSystem;
-      hostPlatform = localSystem;
-      targetPlatform = localSystem;
       inherit config overlays;
       stdenv = thisStdenv;
     };
@@ -236,6 +241,11 @@ in
         nativeTools = false;
         nativeLibc = false;
         isGNU = true;
+        buildPackages = {
+          inherit (prevStage) stdenv;
+        };
+        hostPlatform = localSystem;
+        targetPlatform = localSystem;
         cc = prevStage.gcc-unwrapped;
         libc = self.glibc;
         inherit (self) stdenv binutils coreutils gnugrep;
@@ -256,12 +266,12 @@ in
   # dependency (`nix-store -qR') on bootstrapTools or the first
   # binutils built.
   (prevStage: {
-    buildPlatform = localSystem;
-    hostPlatform = localSystem;
-    targetPlatform = localSystem;
     inherit config overlays;
     stdenv = import ../generic rec {
-      inherit system config;
+      buildPlatform = localSystem;
+      hostPlatform = localSystem;
+      targetPlatform = localSystem;
+      inherit config;
 
       preHook = ''
         # Make "strip" produce deterministic output, by setting

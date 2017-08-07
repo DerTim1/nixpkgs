@@ -13,6 +13,7 @@
 , callPackage
 , self
 , CF, configd
+, python-setup-hook
 # For the Python package set
 , pkgs, packageOverrides ? (self: super: {})
 }:
@@ -69,6 +70,7 @@ in stdenv.mkDerivation {
       url = https://github.com/python/cpython/commit/035ba5da3e53e.patch;
       sha256 = "1y74ir1w5cq542w27rgzgp70chhq2x047db9911mihpab8p2nj71";
     })
+    ./no-ldconfig.patch
   ];
 
   postPatch = ''
@@ -102,7 +104,7 @@ in stdenv.mkDerivation {
      ''}
   '';
 
-  setupHook = ./setup-hook.sh;
+  setupHook = python-setup-hook sitePackages;
 
   postInstall = ''
     # needed for some packages, especially packages that backport functionality

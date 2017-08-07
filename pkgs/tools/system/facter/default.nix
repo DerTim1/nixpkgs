@@ -2,14 +2,17 @@
 
 stdenv.mkDerivation rec {
   name = "facter-${version}";
-  version = "3.6.0";
+  version = "3.6.6";
 
   src = fetchFromGitHub {
-    sha256 = "1fwvjd84nw39lgclkz4kn90z84fs9lsama3ikq0qs1in3y3jfmvi";
+    sha256 = "07jphvwfmvrq28f8k15k16kz090zvb11nn6bd895fz5axag01ins";
     rev = version;
     repo = "facter";
     owner = "puppetlabs";
   };
+
+  CXXFLAGS = "-fpermissive";
+  NIX_CFLAGS_COMPILE = "-Wno-error";
 
   cmakeFlags = [ "-DFACTER_RUBY=${ruby}/lib/libruby.so" ];
 
@@ -17,6 +20,8 @@ stdenv.mkDerivation rec {
   preConfigure = "cmakeFlags+=\" -DRUBY_LIB_INSTALL=$out/lib/ruby\"";
 
   buildInputs = [ boost cmake cpp-hocon curl leatherman libyamlcpp openssl ruby utillinux ];
+
+  enableParallelBuilding = true;
 
   meta = with stdenv.lib; {
     homepage = https://github.com/puppetlabs/facter;

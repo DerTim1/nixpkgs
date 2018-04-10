@@ -10,6 +10,8 @@
   lib,
   pkgs,
   pigz,
+  nixUnstable,
+  perl,
   runCommand,
   rsync,
   shadow,
@@ -27,7 +29,7 @@
 rec {
 
   examples = import ./examples.nix {
-    inherit pkgs buildImage pullImage shadowSetup;
+    inherit pkgs buildImage pullImage shadowSetup buildImageWithNixDb;
   };
 
   pullImage = callPackage ./pull.nix {};
@@ -42,8 +44,8 @@ rec {
 
     cp ${./tarsum.go} tarsum.go
     export GOPATH=$(pwd)
-    mkdir src
-    ln -sT ${docker.src}/components/engine/pkg/tarsum src/tarsum
+    mkdir -p src/github.com/docker/docker/pkg
+    ln -sT ${docker.src}/components/engine/pkg/tarsum src/github.com/docker/docker/pkg/tarsum
     go build
 
     cp tarsum $out
@@ -210,7 +212,7 @@ rec {
 
       postMount = ''
         echo "Packing raw image..."
-        tar -C mnt --mtime="@$SOURCE_DATE_EPOCH" -cf $out .
+        tar -C mnt --hard-dereference --sort=name --mtime="@$SOURCE_DATE_EPOCH" -cf $out .
       '';
     };
 
@@ -226,6 +228,19 @@ rec {
       ${text}
     '';
 
+  nixRegistration = contents: runCommand "nix-registration" {
+    buildInputs = [ nixUnstable perl ];
+    # For obtaining the closure of `contents'.
+    exportReferencesGraph =
+      let contentsList = if builtins.isList contents then contents else [ contents ];
+      in map (x: [("closure-" + baseNameOf x) x]) contentsList;
+    }
+    ''
+      mkdir $out
+      printRegistration=1 perl ${pkgs.pathsFromGraph} closure-* > $out/db.dump
+      perl ${pkgs.pathsFromGraph} closure-* > $out/storePaths
+    '';
+
   # Create a "layer" (set of files).
   mkPureLayer = {
     # Name of the layer
@@ -234,6 +249,10 @@ rec {
     baseJson,
     # Files to add to the layer.
     contents ? null,
+    # When copying the contents into the image, preserve symlinks to
+    # directories (see `rsync -K`).  Otherwise, transform those symlinks
+    # into directories.
+    keepContentsDirlinks ? false,
     # Additional commands to run on the layer before it is tar'd up.
     extraCommands ? "", uid ? 0, gid ? 0
   }:
@@ -247,7 +266,7 @@ rec {
         echo "Adding contents..."
         for item in $contents; do
           echo "Adding $item"
-          rsync -ak --chown=0:0 $item/ layer/
+          rsync -a${if keepContentsDirlinks then "K" else "k"} --chown=0:0 $item/ layer/
         done
       else
         echo "No contents to add to layer."
@@ -262,7 +281,7 @@ rec {
       # Tar up the layer and throw it into 'layer.tar'.
       echo "Packing layer..."
       mkdir $out
-      tar -C layer --mtime="@$SOURCE_DATE_EPOCH" --owner=${toString uid} --group=${toString gid} -cf $out/layer.tar .
+      tar -C layer --hard-dereference --sort=name --mtime="@$SOURCE_DATE_EPOCH" --owner=${toString uid} --group=${toString gid} -cf $out/layer.tar .
 
       # Compute a checksum of the tarball.
       echo "Computing layer checksum..."
@@ -288,6 +307,10 @@ rec {
     runAsRoot,
     # Files to add to the layer. If null, an empty layer will be created.
     contents ? null,
+    # When copying the contents into the image, preserve symlinks to
+    # directories (see `rsync -K`).  Otherwise, transform those symlinks
+    # into directories.
+    keepContentsDirlinks ? false,
     # JSON containing configuration and metadata for this layer.
     baseJson,
     # Existing image onto which to append the new layer.
@@ -312,7 +335,7 @@ rec {
         echo "Adding contents..."
         for item in ${toString contents}; do
           echo "Adding $item..."
-          rsync -ak --chown=0:0 $item/ layer/
+          rsync -a${if keepContentsDirlinks then "K" else "k"} --chown=0:0 $item/ layer/
         done
 
         chmod ug+w layer
@@ -344,7 +367,7 @@ rec {
 
         echo "Packing layer..."
         mkdir $out
-        tar -C layer --mtime="@$SOURCE_DATE_EPOCH" -cf $out/layer.tar .
+        tar -C layer --hard-dereference --sort=name --mtime="@$SOURCE_DATE_EPOCH" -cf $out/layer.tar .
 
         # Compute the tar checksum and add it to the output json.
         echo "Computing checksum..."
@@ -376,6 +399,10 @@ rec {
     fromImageTag ? null,
     # Files to put on the image (a nix store path or list of paths).
     contents ? null,
+    # When copying the contents into the image, preserve symlinks to
+    # directories (see `rsync -K`).  Otherwise, transform those symlinks
+    # into directories.
+    keepContentsDirlinks ? false,
     # Docker config; e.g. what command to run on the container.
     config ? null,
     # Optional bash script to run on the files prior to fixturizing the layer.
@@ -402,11 +429,12 @@ rec {
         if runAsRoot == null
         then mkPureLayer {
           name = baseName;
-          inherit baseJson contents extraCommands uid gid;
+          inherit baseJson contents keepContentsDirlinks extraCommands uid gid;
         } else mkRootLayer {
           name = baseName;
           inherit baseJson fromImage fromImageName fromImageTag
-                  contents runAsRoot diskSize extraCommands;
+                  contents keepContentsDirlinks runAsRoot diskSize
+                  extraCommands;
         };
       result = runCommand "docker-image-${baseName}.tar.gz" {
         buildInputs = [ jshon pigz coreutils findutils jq ];
@@ -461,8 +489,6 @@ rec {
         cp ${layer}/* temp/
         chmod ug+w temp/*
 
-        echo "$(dirname ${storeDir})" >> layerFiles
-        echo '${storeDir}' >> layerFiles
         for dep in $(cat $layerClosure); do
           find $dep >> layerFiles
         done
@@ -476,7 +502,7 @@ rec {
         comm <(sort -n baseFiles|uniq) \
              <(sort -n layerFiles|uniq|grep -v ${layer}) -1 -3 > newFiles
         # Append the new files to the layer.
-        tar -rpf temp/layer.tar --mtime="@$SOURCE_DATE_EPOCH" \
+        tar -rpf temp/layer.tar --hard-dereference --sort=name --mtime="@$SOURCE_DATE_EPOCH" \
           --owner=0 --group=0 --no-recursion --files-from newFiles
 
         echo "Adding meta..."
@@ -524,11 +550,44 @@ rec {
         chmod -R a-w image
 
         echo "Cooking the image..."
-        tar -C image --mtime="@$SOURCE_DATE_EPOCH" --owner=0 --group=0 --xform s:'./':: -c . | pigz -nT > $out
+        tar -C image --hard-dereference --sort=name --mtime="@$SOURCE_DATE_EPOCH" --owner=0 --group=0 --xform s:'./':: -c . | pigz -nT > $out
 
         echo "Finished."
       '';
 
     in
     result;
+
+  # Build an image and populate its nix database with the provided
+  # contents. The main purpose is to be able to use nix commands in
+  # the container.
+  # Be careful since this doesn't work well with multilayer.
+  buildImageWithNixDb = args@{ contents ? null, extraCommands ? "", ... }:
+    buildImage (args // {
+      extraCommands = ''
+        echo "Generating the nix database..."
+        echo "Warning: only the database of the deepest Nix layer is loaded."
+        echo "         If you want to use nix commands in the container, it would"
+        echo "         be better to only have one layer that contains a nix store."
+        # This requires Nix 1.12 or higher
+        export NIX_REMOTE=local?root=$PWD
+        ${nixUnstable}/bin/nix-store --load-db < ${nixRegistration contents}/db.dump
+
+        # We fill the store in order to run the 'verify' command that
+        # generates hash and size of output paths.
+        # Note when Nix 1.12 is be the stable one, the database dump
+        # generated by the exportReferencesGraph function will
+        # contains sha and size. See
+        # https://github.com/NixOS/nix/commit/c2b0d8749f7e77afc1c4b3e8dd36b7ee9720af4a
+        storePaths=$(cat ${nixRegistration contents}/storePaths)
+        echo "Copying everything to /nix/store (will take a while)..."
+        cp -prd $storePaths nix/store/
+        ${nixUnstable}/bin/nix-store --verify --check-contents
+
+        mkdir -p nix/var/nix/gcroots/docker/
+        for i in ${lib.concatStringsSep " " contents}; do
+          ln -s $i nix/var/nix/gcroots/docker/$(basename $i)
+        done;
+      '' + extraCommands;
+    });
 }

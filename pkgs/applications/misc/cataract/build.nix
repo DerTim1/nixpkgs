@@ -19,7 +19,8 @@ stdenv.mkDerivation rec {
     inherit sha256 rev;
   };
 
-  buildInputs = [ autoreconfHook glib pkgconfig libxml2 exiv2 imagemagick ];
+  nativeBuildInputs = [ autoreconfHook pkgconfig ];
+  buildInputs = [ glib libxml2 exiv2 imagemagick ];
 
   installPhase = ''
     mkdir $out/{bin,share} -p
@@ -30,7 +31,7 @@ stdenv.mkDerivation rec {
     homepage = http://cgg.bzatek.net/;
     description = "a simple static web photo gallery, designed to be clean and easily usable";
     license = stdenv.lib.licenses.gpl2;
-    maintainers = [ stdenv.lib.maintainers.matthiasbeyer ];
+    maintainers = with stdenv.lib.maintainers; [ ];
     platforms = with stdenv.lib.platforms; linux ++ darwin;
   };
 }

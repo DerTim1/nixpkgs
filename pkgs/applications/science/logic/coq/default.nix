@@ -9,7 +9,7 @@
 , ocamlPackages, ncurses
 , buildIde ? true
 , csdp ? null
-, version ? "8.6.1"
+, version
 }:
 
 let
@@ -19,7 +19,10 @@ let
    "8.5pl3"    = "15c3rdk59nifzihsp97z4vjxis5xmsnrvpb86qiazj143z2fmdgw";
    "8.6"       = "148mb48zpdax56c0blfi7v67lx014lnmrvxxasi28hsibyz2lvg4";
    "8.6.1"     = "0llrxcxwy5j87vbbjnisw42rfw1n1pm5602ssx64xaxx3k176g6l";
-   "8.7+beta1" = "006rn5896pf39p4z9c6d4xj4zm80j4b67v5gwcixd63msrjqkmxp";
+   "8.7.0"     = "1h18b7xpnx3ix9vsi5fx4zdcbxy7bhra7gd5c5yzxmk53cgf1p9m";
+   "8.7.1"     = "0gjn59jkbxwrihk8fx9d823wjyjh5m9gvj9l31nv6z6bcqhgdqi8";
+   "8.7.2"     = "0a0657xby8wdq4aqb2xsxp3n7pmc2w4yxjmrb2l4kccs1aqvaj4w";
+   "8.8+beta1" = "19ipmx6bf8wjpk8y29hcginxk7hps4jh1bbihn5icx4qysm81165";
   }."${version}";
   coq-version = builtins.substring 0 3 version;
   camlp5 = ocamlPackages.camlp5_strict;
@@ -35,7 +38,7 @@ self = stdenv.mkDerivation {
   inherit camlp5;
   inherit (ocamlPackages) ocaml;
   passthru = {
-    inherit (ocamlPackages) findlib;
+    inherit (ocamlPackages) findlib num;
     emacsBufferSetup = pkgs: ''
       ; Propagate coq paths to children
       (inherit-local-permanent coq-prog-name "${self}/bin/coqtop")
@@ -89,7 +92,9 @@ self = stdenv.mkDerivation {
     inherit sha256;
   };
 
-  buildInputs = [ pkgconfig ocamlPackages.ocaml ocamlPackages.findlib camlp5 ncurses ocamlPackages.lablgtk ];
+  nativeBuildInputs = [ pkgconfig ];
+  buildInputs = [ ocamlPackages.ocaml ocamlPackages.findlib camlp5 ncurses ocamlPackages.num ]
+  ++ stdenv.lib.optional buildIde ocamlPackages.lablgtk;
 
   postPatch = ''
     UNAME=$(type -tp uname)
@@ -107,12 +112,11 @@ self = stdenv.mkDerivation {
       fi
     }
 
-    envHooks=(''${envHooks[@]} addCoqPath)
+    addEnvHooks "$targetOffset" addCoqPath
   '';
 
   preConfigure = ''
     configureFlagsArray=(
-      -opt
       ${ideFlags}
     )
   '';

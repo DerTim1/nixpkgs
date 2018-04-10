@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, pkgconfig, intltool, glib
+{ stdenv, fetchurl, pkgconfig, intltool, glib, mate
 , alsaSupport ? stdenv.isLinux, alsaLib
 , pulseaudioSupport ? stdenv.config.pulseaudio or true, libpulseaudio
 , ossSupport ? false
@@ -6,13 +6,11 @@
 
 stdenv.mkDerivation rec {
   name = "libmatemixer-${version}";
-  version = "${major-ver}.${minor-ver}";
-  major-ver = "1.18";
-  minor-ver = "0";
+  version = "1.20.0";
 
   src = fetchurl {
-    url = "http://pub.mate-desktop.org/releases/${major-ver}/${name}.tar.xz";
-    sha256 = "09vyxnlnalws318gsafdfi5c6jwpp92pbafn1ddlqqds23ihk4mr";
+    url = "http://pub.mate-desktop.org/releases/${mate.getRelease version}/${name}.tar.xz";
+    sha256 = "0jpfaqbspn2mjv6ysgzdmzhb07gx61yiiiwmrw94qymld2igrzb5";
   };
 
   nativeBuildInputs = [ pkgconfig intltool ];
@@ -27,7 +25,7 @@ stdenv.mkDerivation rec {
     description = "Mixer library for MATE";
     homepage = https://github.com/mate-desktop/libmatemixer;
     license = with licenses; [ gpl2 lgpl2 ];
-    platforms = platforms.unix;
+    platforms = platforms.linux;
     maintainers = [ maintainers.romildo ];
   };
 }

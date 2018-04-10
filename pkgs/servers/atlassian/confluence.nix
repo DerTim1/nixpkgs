@@ -5,11 +5,11 @@
 
 stdenv.mkDerivation rec {
   name = "atlassian-confluence-${version}";
-  version = "6.3.1";
+  version = "6.6.1";
 
   src = fetchurl {
     url = "https://www.atlassian.com/software/confluence/downloads/binary/${name}.tar.gz";
-    sha256 = "0f7hc8q4sigvr9bdxx8phnp6bkfkz9bccwkrx0xqyrvvdc5x5690";
+    sha256 = "0nb8rjzfd0fqd9k1yxa3dj7kxgh84dgbg9l8jyj59g74ym77qmw0";
   };
 
   phases = [ "unpackPhase" "buildPhase" "installPhase" ];

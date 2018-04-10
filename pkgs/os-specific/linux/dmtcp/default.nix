@@ -2,16 +2,18 @@
 
 stdenv.mkDerivation rec {
   name = "dmtcp-${version}";
-  version = "2.5.1";
+  version = "2.5.2";
 
   src = fetchFromGitHub {
     owner = "dmtcp";
     repo = "dmtcp";
     rev = version;
-    sha256 = "1z6cc7avs2sj8csf7rapf7nbw0giva6xpj0cshv7p9s643y8yxmi";
+    sha256 = "1sq38in4wk855yhfnzbs9xpnps97fhja93w08xjmx7szzm33g5a8";
   };
 
   dontDisableStatic = true;
+
+  patches = [ ./ld-linux-so-buffer-size.patch ];
 
   postPatch = ''
     patchShebangs .
@@ -19,9 +21,6 @@ stdenv.mkDerivation rec {
     substituteInPlace configure \
       --replace '#define ELF_INTERPRETER "$interp"' \
                 "#define ELF_INTERPRETER \"$(cat $NIX_CC/nix-support/dynamic-linker)\""
-  '';
-
-  preConfigure = ''
     substituteInPlace src/dmtcp_coordinator.cpp \
       --replace /bin/bash ${stdenv.shell}
     substituteInPlace util/gdb-add-symbol-file \

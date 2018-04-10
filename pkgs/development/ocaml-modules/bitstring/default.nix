@@ -2,10 +2,10 @@
 
 buildOcaml rec {
   name = "bitstring";
-  version = "2.1.0";
+  version = "2.1.1";
   src = fetchurl {
-    url = http://github.com/xguerin/bitstring/archive/v2.1.0.tar.gz;
-    sha256 = "0miw4banfpmx4kxrckpqr57b1fcmsqdmspyjx6gqjd4kghm4l7xj";
+    url = http://github.com/xguerin/bitstring/archive/v2.1.1.tar.gz;
+    sha256 = "0vy8ibrxccii1jbsk5q6yh1kxjigqvi7lhhcmizvd5gfhf7mfyc8";
   };
 
   patches = [ ./camlp4-git.patch ./srcdir.patch ];
@@ -20,7 +20,7 @@ buildOcaml rec {
 
   meta = with stdenv.lib; {
     description = "This library adds Erlang-style bitstrings and matching over bitstrings as a syntax extension and library for OCaml";
-    homepage = http://code.google.com/p/bitstring/;
+    homepage = https://github.com/xguerin/bitstring;
     license = licenses.lgpl21Plus;
     maintainers = [ maintainers.maurer ];
   };

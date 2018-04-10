@@ -33,7 +33,7 @@ let
     in
       pkgs.writeScript "container-init"
       ''
-        #! ${pkgs.stdenv.shell} -e
+        #! ${pkgs.runtimeShell} -e
 
         # Initialise the container side of the veth pair.
         if [ "$PRIVATE_NETWORK" = 1 ]; then
@@ -223,7 +223,7 @@ let
   serviceDirectives = cfg: {
     ExecReload = pkgs.writeScript "reload-container"
       ''
-        #! ${pkgs.stdenv.shell} -e
+        #! ${pkgs.runtimeShell} -e
         ${pkgs.nixos-container}/bin/nixos-container run "$INSTANCE" -- \
           bash --login -c "''${SYSTEM_PATH:-/nix/var/nix/profiles/system}/bin/switch-to-configuration test"
       '';
@@ -537,7 +537,7 @@ in
               type = types.bool;
               default = false;
               description = ''
-                Wether the container is automatically started at boot-time.
+                Whether the container is automatically started at boot-time.
               '';
             };
 
@@ -596,6 +596,8 @@ in
                   { config, pkgs, ... }:
                   { services.postgresql.enable = true;
                     services.postgresql.package = pkgs.postgresql96;
+                    
+                    system.stateVersion = "17.03";
                   };
               };
           }
@@ -723,6 +725,11 @@ in
       '') config.containers);
 
     networking.dhcpcd.denyInterfaces = [ "ve-*" "vb-*" ];
+
+    services.udev.extraRules = optionalString config.networking.networkmanager.enable ''
+      # Don't manage interfaces created by nixos-container.
+      ENV{INTERFACE}=="v[eb]-*", ENV{NM_UNMANAGED}="1"
+    '';
 
     environment.systemPackages = [ pkgs.nixos-container ];
   });

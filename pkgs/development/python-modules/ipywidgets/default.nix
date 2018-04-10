@@ -14,12 +14,12 @@
 
 buildPythonPackage rec {
   pname = "ipywidgets";
-  version = "7.0.0";
+  version = "7.1.2";
   name = "${pname}-${version}";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "63e454202f72796044e99846881c33767c47fa050735dc1f927657b9cd2b7fcd";
+    sha256 = "4263ce721a1e5b53a84c4595a5e296d270ae0dc534401b536f4dda64e0b0ca02";
   };
 
   # Tests are not distributed

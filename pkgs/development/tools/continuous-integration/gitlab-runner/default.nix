@@ -1,22 +1,22 @@
 { lib, buildGoPackage, fetchFromGitLab, fetchurl, go-bindata }:
 
 let
-  version = "9.5.0";
+  version = "10.6.0";
   # Gitlab runner embeds some docker images these are prebuilt for arm and x86_64
   docker_x86_64 = fetchurl {
-    url = "https://gitlab-ci-multi-runner-downloads.s3.amazonaws.com/v${version}/docker/prebuilt-x86_64.tar.xz";
-    sha256 = "05vph5pqw3wlrh76bfgrmhgzsjsf7llzscr9vr7nk3b2pcigawdp";
+    url = "https://gitlab-runner-downloads.s3.amazonaws.com/v${version}/docker/prebuilt-x86_64.tar.xz";
+    sha256 = "0icn4xgnlrmxvhbw1lrdkg3x0cr9vhbi1vc51ahd708f9hd64ik6";
   };
 
   docker_arm = fetchurl {
-    url = "https://gitlab-ci-multi-runner-downloads.s3.amazonaws.com/v${version}/docker/prebuilt-arm.tar.xz";
-    sha256 = "0ilp793kbw0n6nhbcdqc1cb05h2ir27c1rkijyxaqvpczrm11lqj";
+    url = "https://gitlab-runner-downloads.s3.amazonaws.com/v${version}/docker/prebuilt-arm.tar.xz";
+    sha256 = "0wgkvgcmby89w1vy06v7milj62656zflw2wi2g30645g72gz0as9";
   };
 in
 buildGoPackage rec {
   inherit version;
   name = "gitlab-runner-${version}";
-  goPackagePath = "gitlab.com/gitlab-org/gitlab-ci-multi-runner";
+  goPackagePath = "gitlab.com/gitlab-org/gitlab-runner";
   commonPackagePath = "${goPackagePath}/common";
   buildFlagsArray = ''
     -ldflags=
@@ -27,9 +27,9 @@ buildGoPackage rec {
 
   src = fetchFromGitLab {
     owner = "gitlab-org";
-    repo = "gitlab-ci-multi-runner";
+    repo = "gitlab-runner";
     rev = "v${version}";
-    sha256 = "0zpyvaflq62qazjw60xnzfw52fqbcmjaqig9y8i6wjzdzlm803f0";
+    sha256 = "113vkx3dnv3fvnracszlhf56fb5jr41fr3s0bs025hv8b9sp04zz";
   };
 
   patches = [ ./fix-shell-path.patch ];
@@ -54,8 +54,6 @@ buildGoPackage rec {
 
   postInstall = ''
     install -d $out/bin
-    # The recommended name is gitlab-runner so we create a symlink with that name
-    ln -sf gitlab-ci-multi-runner $bin/bin/gitlab-runner
   '';
 
   meta = with lib; {

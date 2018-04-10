@@ -1,4 +1,11 @@
 { pkgs ? import <nixpkgs> {} }:
+## we default to importing <nixpkgs> here, so that you can use
+## a simple shell command to insert new sha256's into this file
+## e.g. with emacs C-u M-x shell-command
+##
+##     nix-prefetch-url sources.nix -A {stable{,.mono,.gecko64,.gecko32}, unstable, staging, winetricks}
+
+# here we wrap fetchurl and fetchFromGitHub, in order to be able to pass additional args around it
 let fetchurl = args@{url, sha256, ...}:
   pkgs.fetchurl { inherit url sha256; } // args;
     fetchFromGitHub = args@{owner, repo, rev, sha256, ...}:
@@ -6,9 +13,9 @@ let fetchurl = args@{url, sha256, ...}:
 in rec {
 
   stable = fetchurl rec {
-    version = "2.0.2";
-    url = "https://dl.winehq.org/wine/source/2.0/wine-${version}.tar.xz";
-    sha256 = "16iwf48cfi39aqyy8131jz4x7lr551c9yc0mnks7g24j77sq867p";
+    version = "3.0";
+    url = "https://dl.winehq.org/wine/source/3.0/wine-${version}.tar.xz";
+    sha256 = "1v7vq9iinkscbq6wg85fb0d2137660fg2nk5iabxkl2wr850asil";
 
     ## see http://wiki.winehq.org/Gecko
     gecko32 = fetchurl rec {
@@ -32,23 +39,25 @@ in rec {
 
   unstable = fetchurl rec {
     # NOTE: Don't forget to change the SHA256 for staging as well.
-    version = "2.16";
-    url = "https://dl.winehq.org/wine/source/2.x/wine-${version}.tar.xz";
-    sha256 = "089cvb7gvhcq5kx1h114fmr09fmj84cz2bjvisa48v6dpv5fsqd5";
+    version = "3.5";
+    url = "https://dl.winehq.org/wine/source/3.x/wine-${version}.tar.xz";
+    sha256 = "0hr1syfhnpvcm84gmms1i26k68hakcgw4m6dvckmbbvw7ca0c8pl";
     inherit (stable) mono gecko32 gecko64;
   };
 
   staging = fetchFromGitHub rec {
+    # https://github.com/wine-compholio/wine-staging/releases
     inherit (unstable) version;
-    sha256 = "1q9dnifz02l96s1bafb4w2z779k8ancl37zd7wxbkf0ks2vrnln0";
-    owner = "wine-compholio";
+    sha256 = "0kcwg7w79zbsg29b9ma9mapzhj9dg7z0vccy4a35fx04044xj0zn";
+    owner = "wine-staging";
     repo = "wine-staging";
     rev = "v${version}";
   };
 
   winetricks = fetchFromGitHub rec {
-    version = "20170823";
-    sha256 = "15kjic39nl3z4g9l9galwkajl108fxfwaa0d9nssp54wg6villwx";
+    # https://github.com/Winetricks/winetricks/releases
+    version = "20180217";
+    sha256 = "0k3vlsqjbzys5dfbxwgw76al8gh44jsjqkc06va103frkrgjxvc5";
     owner = "Winetricks";
     repo = "winetricks";
     rev = version;

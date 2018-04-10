@@ -15,15 +15,16 @@ assert guiSupport -> pinentry != null;
 stdenv.mkDerivation rec {
   name = "gnupg-${version}";
 
-  version = "2.2.0";
+  version = "2.2.5";
 
   src = fetchurl {
     url = "mirror://gnupg/gnupg/${name}.tar.bz2";
-    sha256 = "1rj538kp3wsdq7rhl8sy1wpwhlsbxcch0cwk64kgz8gpw05lllfl";
+    sha256 = "0mzgibq4dpxh3i9anmwg12xdjry28y83icafhx3j3djg5niqk89z";
   };
 
+  nativeBuildInputs = [ pkgconfig ];
   buildInputs = [
-    pkgconfig libgcrypt libassuan libksba libiconv npth gettext texinfo
+    libgcrypt libassuan libksba libiconv npth gettext texinfo
     readline libusb gnutls adns openldap zlib bzip2 sqlite
   ];
 

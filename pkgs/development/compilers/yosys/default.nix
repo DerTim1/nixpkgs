@@ -1,28 +1,44 @@
-{ stdenv, fetchFromGitHub, fetchFromBitbucket, pkgconfig, tcl, readline, libffi, python3, bison, flex }:
+{ stdenv, fetchFromGitHub, fetchFromBitbucket
+, pkgconfig, tcl, readline, libffi, python3, bison, flex
+}:
+
+with builtins;
 
 stdenv.mkDerivation rec {
   name = "yosys-${version}";
-  version = "2017.09.01";
+  version = "2018.03.21";
 
   srcs = [
     (fetchFromGitHub {
-      owner = "cliffordwolf";
-      repo = "yosys";
-      rev = "18609f3df82a3403c41d552908183f7e49ff5678";
-      sha256 = "0qdjxqg3l098g8pda5a4cif4bd78rx7vilv3z62r56ppj55mgw96";
-      name = "yosys";
+      owner  = "yosyshq";
+      repo   = "yosys";
+      rev    = "3f0070247590458c5ed28c5a7abfc3b9d1ec138b";
+      sha256 = "0rsnjk25asg7dkxcmim464rmxgvm7x7njmcp5nyl8y4iwn8i9p8v";
+      name   = "yosys";
     })
+
+    # NOTE: the version of abc used here is synchronized with
+    # the one in the yosys Makefile of the version above;
+    # keep them the same for quality purposes.
     (fetchFromBitbucket {
-      owner = "alanmi";
-      repo = "abc";
-      rev = "ff5be0604997";
-      sha256 = "08gdvxm44dvhgjw6lf2jx0xyk6h4ai37h6b88dysvaa69sx7rh8n";
-      name = "yosys-abc";
+      owner  = "alanmi";
+      repo   = "abc";
+      rev    = "6e3c24b3308a";
+      sha256 = "1i4wv0si4fb6dpv2yrpkp588mdlfrnx2s02q2fgra5apdm54c53w";
+      name   = "yosys-abc";
     })
   ];
   sourceRoot = "yosys";
 
-  buildInputs = [ pkgconfig tcl readline libffi python3 bison flex ];
+  enableParallelBuilding = true;
+  nativeBuildInputs = [ pkgconfig ];
+  buildInputs = [ tcl readline libffi python3 bison flex ];
+
+  patchPhase = ''
+    substituteInPlace ./Makefile \
+      --replace 'echo UNKNOWN' 'echo ${substring 0 10 (elemAt srcs 0).rev}'
+  '';
+
   preBuild = ''
     chmod -R u+w ../yosys-abc
     ln -s ../yosys-abc abc
@@ -42,9 +58,9 @@ stdenv.mkDerivation rec {
       adding additional passes as needed by extending the yosys C++
       code base.
     '';
-    homepage = http://www.clifford.at/yosys/;
-    license = stdenv.lib.licenses.isc;
-    maintainers = [ stdenv.lib.maintainers.shell ];
-    platforms = stdenv.lib.platforms.linux;
+    homepage    = http://www.clifford.at/yosys/;
+    license     = stdenv.lib.licenses.isc;
+    maintainers = with stdenv.lib.maintainers; [ shell thoughtpolice ];
+    platforms   = stdenv.lib.platforms.linux;
   };
 }

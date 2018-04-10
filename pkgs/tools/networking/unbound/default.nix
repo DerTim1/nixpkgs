@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   name = "unbound-${version}";
-  version = "1.6.5";
+  version = "1.6.8";
 
   src = fetchurl {
-    url = "http://unbound.net/downloads/${name}.tar.gz";
-    sha256 = "0khhrj11yhh6a0h578w29yw2j7yzvaqkr4p44jzjapq1549am5z2";
+    url = "https://unbound.net/downloads/${name}.tar.gz";
+    sha256 = "0jfxhh4gc5amhndikskz1s7da27ycn442j3l20bm992n7zijid73";
   };
 
   outputs = [ "out" "lib" "man" ]; # "dev" would only split ~20 kB
@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
 
   installFlags = [ "configfile=\${out}/etc/unbound/unbound.conf" ];
 
-  preFixup = stdenv.lib.optionalString stdenv.isLinux
+  preFixup = stdenv.lib.optionalString (stdenv.isLinux && !stdenv.hostPlatform.isMusl) # XXX: revisit
     # Build libunbound again, but only against nettle instead of openssl.
     # This avoids gnutls.out -> unbound.lib -> openssl.out.
     # There was some problem with this on Darwin; let's not complicate non-Linux.

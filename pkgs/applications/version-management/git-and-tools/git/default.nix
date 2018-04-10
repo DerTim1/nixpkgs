@@ -13,7 +13,7 @@
 }:
 
 let
-  version = "2.14.1";
+  version = "2.17.0";
   svn = subversionClient.override { perlBindings = true; };
 in
 
@@ -22,7 +22,7 @@ stdenv.mkDerivation {
 
   src = fetchurl {
     url = "https://www.kernel.org/pub/software/scm/git/git-${version}.tar.xz";
-    sha256 = "1iic3wiihxp3l3k6d4z886v3869c3dzgddjxnd5124wy1rnlqwkg";
+    sha256 = "1ismz7nsz8dgjmk782xr9s0mr2qh06f72pdcgbxfmnw1bvlya5p9";
   };
 
   hardeningDisable = [ "format" ];
@@ -32,6 +32,7 @@ stdenv.mkDerivation {
     ./symlinks-in-bin.patch
     ./git-sh-i18n.patch
     ./ssh-path.patch
+    ./git-send-email-honor-PATH.patch
   ];
 
   postPatch = ''
@@ -53,13 +54,13 @@ stdenv.mkDerivation {
   NIX_LDFLAGS = stdenv.lib.optionalString (!stdenv.cc.isClang) "-lgcc_s"
               + stdenv.lib.optionalString (stdenv.isFreeBSD) "-lthr";
 
-  # without this, git fails when trying to check for /etc/gitconfig existence
-  propagatedSandboxProfile = stdenv.lib.sandbox.allowDirectoryList "/etc";
-
   makeFlags = "prefix=\${out} PERL_PATH=${perl}/bin/perl SHELL_PATH=${stdenv.shell} "
       + (if pythonSupport then "PYTHON_PATH=${python}/bin/python" else "NO_PYTHON=1")
       + (if stdenv.isSunOS then " INSTALL=install NO_INET_NTOP= NO_INET_PTON=" else "")
-      + (if stdenv.isDarwin then " NO_APPLE_COMMON_CRYPTO=1" else " sysconfdir=/etc/ ");
+      + (if stdenv.isDarwin then " NO_APPLE_COMMON_CRYPTO=1" else " sysconfdir=/etc/ ")
+      # XXX: USE_PCRE2 might be useful in general, look into it
+      # XXX other alpine options?
+      + (if stdenv.hostPlatform.isMusl then "NO_SYS_POLL_H=1 NO_GETTEXT=YesPlease" else "");
 
   # build git-credential-osxkeychain if darwin
   postBuild = stdenv.lib.optionalString stdenv.isDarwin ''
@@ -145,6 +146,22 @@ stdenv.mkDerivation {
       # Also put git-http-backend into $PATH, so that we can use smart
       # HTTP(s) transports for pushing
       ln -s $out/libexec/git-core/git-http-backend $out/bin/git-http-backend
+
+      # wrap perl commands
+      gitperllib=$out/lib/perl5/site_perl
+      for i in ${builtins.toString perlLibs}; do
+        gitperllib=$gitperllib:$i/lib/perl5/site_perl
+      done
+      wrapProgram $out/libexec/git-core/git-cvsimport \
+                  --set GITPERLLIB "$gitperllib"
+      wrapProgram $out/libexec/git-core/git-add--interactive \
+                  --set GITPERLLIB "$gitperllib"
+      wrapProgram $out/libexec/git-core/git-archimport \
+                  --set GITPERLLIB "$gitperllib"
+      wrapProgram $out/libexec/git-core/git-instaweb \
+                  --set GITPERLLIB "$gitperllib"
+      wrapProgram $out/libexec/git-core/git-cvsexportcommit \
+                  --set GITPERLLIB "$gitperllib"
     ''
 
    + (if svnSupport then

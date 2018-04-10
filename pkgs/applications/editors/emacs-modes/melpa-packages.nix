@@ -36,6 +36,9 @@ self:
     });
 
     overrides = {
+      # Expects bash to be at /bin/bash
+      ac-rtags = markBroken super.ac-rtags;
+
       # upstream issue: mismatched filename
       ack-menu = markBroken super.ack-menu;
 
@@ -47,11 +50,14 @@ self:
       bufshow = markBroken super.bufshow;
 
       # part of a larger package
+      caml = dontConfigure super.caml;
+
+      # part of a larger package
       # upstream issue: missing package version
       cmake-mode = markBroken (dontConfigure super.cmake-mode);
 
-      # upstream issue: missing file header
-      cn-outline = markBroken super.cn-outline;
+      # Expects bash to be at /bin/bash
+      company-rtags = markBroken super.company-rtags;
 
       # upstream issue: missing file header
       connection = markBroken super.connection;
@@ -69,16 +75,24 @@ self:
       # upstream issue: missing file header
       elmine = markBroken super.elmine;
 
+      # upstream issue: missing dependency redshank
+      emr = markBroken super.emr;
+
       ess-R-data-view = super.ess-R-data-view.override {
         inherit (self.melpaPackages) ess ctable popup;
       };
 
-      ess-R-object-popup = super.ess-R-object-popup.override {
-        inherit (self.melpaPackages) ess popup;
-      };
+      # upstream issue: missing dependency highlight
+      evil-search-highlight-persist = markBroken super.evil-search-highlight-persist;
+
+      # upstream issue: missing dependency highlight
+      floobits  = markBroken super.floobits;
 
       # missing OCaml
       flycheck-ocaml = markBroken super.flycheck-ocaml;
+
+      # Expects bash to be at /bin/bash
+      flycheck-rtags = markBroken super.flycheck-rtags;
 
       # upstream issue: missing file header
       fold-dwim = markBroken super.fold-dwim;
@@ -89,6 +103,9 @@ self:
       # upstream issue: mismatched filename
       helm-lobsters = markBroken super.helm-lobsters;
 
+      # Expects bash to be at /bin/bash
+      helm-rtags = markBroken super.helm-rtags;
+
       # upstream issue: missing file header
       helm-words = markBroken super.helm-words;
 
@@ -96,7 +113,10 @@ self:
       ido-complete-space-or-hyphen = markBroken super.ido-complete-space-or-hyphen;
 
       # upstream issue: missing file header
-      initsplit = markBroken super.initsplit;
+      initsplit = super.initsplit;
+
+      # Expects bash to be at /bin/bash
+      ivy-rtags = markBroken super.ivy-rtags;
 
       # upstream issue: missing file header
       jsfmt = markBroken super.jsfmt;
@@ -104,14 +124,14 @@ self:
       # upstream issue: missing file header
       link = markBroken super.link;
 
-      # upstream issue: mismatched filename
-      link-hint = markBroken super.link-hint;
-
-      # part of a larger package
-      llvm-mode = dontConfigure super.llvm-mode;
-
       # upstream issue: missing file header
       maxframe = markBroken super.maxframe;
+
+      # version of magit-popup needs to match magit
+      # https://github.com/magit/magit/issues/3286
+      magit = super.magit.override {
+        inherit (self.melpaPackages) magit-popup;
+      };
 
       # missing OCaml
       merlin = markBroken super.merlin;
@@ -128,6 +148,9 @@ self:
 
       # missing OCaml
       ocp-indent = markBroken super.ocp-indent;
+
+      # upstream issue: missing dependency
+      org-readme = markBroken super.org-readme;
 
       # upstream issue: missing file header
       perl-completion = markBroken super.perl-completion;
@@ -150,6 +173,9 @@ self:
       # upstream issue: missing file footer
       seoul256-theme = markBroken super.seoul256-theme;
 
+      # upstream issue: missing dependency highlight
+      sonic-pi  = markBroken super.sonic-pi;
+
       spaceline = super.spaceline.override {
         inherit (self.melpaPackages) powerline;
       };
@@ -161,6 +187,9 @@ self:
       stgit = markBroken super.stgit;
 
       # upstream issue: missing file header
+      tawny-mode = markBroken super.tawny-mode;
+
+      # upstream issue: missing file header
       textmate = markBroken super.textmate;
 
       # missing OCaml
@@ -168,6 +197,9 @@ self:
 
       # upstream issue: missing file header
       voca-builder = markBroken super.voca-builder;
+
+      # upstream issue: missing dependency
+      weechat-alert = markBroken super.weechat-alert;
 
       # upstream issue: missing file header
       window-numbering = markBroken super.window-numbering;

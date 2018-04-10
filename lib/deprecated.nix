@@ -1,11 +1,12 @@
-let lib = import ./default.nix;
-    inherit (builtins) isFunction head tail isList isAttrs isInt attrNames;
+{ lib }:
+let
+    inherit (builtins) head tail isList isAttrs isInt attrNames;
 
 in
 
-with import ./lists.nix;
-with import ./attrsets.nix;
-with import ./strings.nix;
+with lib.lists;
+with lib.attrsets;
+with lib.strings;
 
 rec {
 
@@ -52,7 +53,7 @@ rec {
           f:        # the function applied to the arguments
           initial:  # you pass attrs, the functions below are passing a function taking the fix argument
     let
-        takeFixed = if isFunction initial then initial else (fixed : initial); # transform initial to an expression always taking the fixed argument
+        takeFixed = if lib.isFunction initial then initial else (fixed : initial); # transform initial to an expression always taking the fixed argument
         tidy = args:
             let # apply all functions given in "applyPreTidy" in sequence
                 applyPreTidyFun = fold ( n: a: x: n ( a x ) ) lib.id (maybeAttr "applyPreTidy" [] args);
@@ -62,7 +63,7 @@ rec {
                     let args = takeFixed fixed;
                         mergeFun = args.${n};
                     in if isAttrs x then (mergeFun args x)
-                       else assert isFunction x;
+                       else assert lib.isFunction x;
                             mergeFun args (x ( args // { inherit fixed; }));
             in overridableDelayableArgs f newArgs;
     in
@@ -373,7 +374,7 @@ rec {
       if isAttrs x then
           if x ? outPath then "derivation"
           else "attrs"
-      else if isFunction x then "function"
+      else if lib.isFunction x then "function"
       else if isList x then "list"
       else if x == true then "bool"
       else if x == false then "bool"

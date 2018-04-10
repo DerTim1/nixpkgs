@@ -1,6 +1,11 @@
 { stdenv, fetchFromGitHub, autoreconfHook, coq, ocamlPackages }:
 
-let param = {
+let params = {
+  "8.7" = {
+    version = "0.6.2";
+    rev = "d76ddde37d918569945774733b7997e8b24daf51";
+    sha256 = "04lnf4b25yarysj848cfl8pd3i3pr3818acyp9hgwdgd1rqmhjwm";
+  };
   "8.6" = {
     version = "0.6.1";
     rev = "c3b87af6bfa338e18b83f014ebd0e56e1f611663";
@@ -11,7 +16,9 @@ let param = {
     rev = "v0.6";
     sha256 = "0qvar8gfbrcs9fmvkph5asqz4l5fi63caykx3bsn8zf0xllkwv0n";
   };
-}."${coq.coq-version}"; in
+};
+param = params."${coq.coq-version}";
+in
 
 stdenv.mkDerivation {
   name = "coq${coq.coq-version}-dpdgraph-${param.version}";
@@ -21,7 +28,8 @@ stdenv.mkDerivation {
     inherit (param) rev sha256;
   };
 
-  buildInputs = [ autoreconfHook coq ]
+  nativeBuildInputs = [ autoreconfHook ];
+  buildInputs = [ coq coq.camlp5 ]
   ++ (with ocamlPackages; [ ocaml findlib ocamlgraph ]);
 
   preInstall = ''
@@ -40,4 +48,9 @@ stdenv.mkDerivation {
     maintainers = with stdenv.lib.maintainers; [ vbgl ];
     platforms = coq.meta.platforms;
   };
+
+  passthru = {
+    compatibleCoqVersions = v: builtins.hasAttr v params;
+  };
+
 }

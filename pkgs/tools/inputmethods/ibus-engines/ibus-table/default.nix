@@ -5,13 +5,13 @@
 
 stdenv.mkDerivation rec {
   name = "ibus-table-${version}";
-  version = "1.9.16";
+  version = "1.9.18";
 
   src = fetchFromGitHub {
     owner  = "kaio";
     repo   = "ibus-table";
     rev    = version;
-    sha256 = "1gkb6nsibk59kp404b394sg638jgah2a2b6ffq3gkacqg5j30wjb";
+    sha256 = "0isxgz7f6xhrcv5qrdd6gm3ysmqp3mi5ngnbqz08f7pclllaridp";
   };
 
   postPatch = ''
@@ -29,7 +29,7 @@ stdenv.mkDerivation rec {
   '';
 
   buildInputs = [
-    dconf gtk3 gobjectIntrospection ibus python3
+    dconf gtk3 gobjectIntrospection ibus (python3.withPackages (pypkgs: with pypkgs; [ pygobject3 ]))
   ];
 
   nativeBuildInputs = [ autoreconfHook docbook2x pkgconfig python3.pkgs.wrapPython ];

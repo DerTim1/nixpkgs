@@ -4,15 +4,15 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-alicloud";
-      version = "0.1.0";
-      sha256  = "199zrpmi1hqy80nrvdhh5pn7vlcvpjcsf0hpwgzb1r9vnydpz7cj";
+      version = "1.9.0";
+      sha256  = "19jqyzpcnlraxzn8bvrjzsh81j7dfadswgxfsiqzxll9xbm0k2bv";
     };
   archive =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-archive";
-      version = "0.1.0";
-      sha256  = "1g7bjak1vgxpnmp4b9cb3mq8gqp1a7738fj0sxzflfk8k35p27ri";
+      version = "1.0.3";
+      sha256  = "1il8v9zi838naprr8dqzipk6ns71l8vdqidarxklnn8wdwxmacg4";
     };
   arukas =
     {
@@ -32,13 +32,13 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-aws";
-      version = "0.1.4";
-      sha256  = "0hqyvp1bgyfqq2lkjq5m5qxybagnxl9zrqiqfnlrfigdp0y31iz8";
+      version = "1.13.0";
+      sha256  = "09ba2r3avqbl85s8llmgkk6gwgfkzm83994kd965r481xcnfv1ny";
     };
-  azure =
+  azure-classic =
     {
       owner   = "terraform-providers";
-      repo    = "terraform-provider-azure";
+      repo    = "terraform-provider-azure-classic";
       version = "0.1.1";
       sha256  = "11myqq3wnxvpysjycvwg7b14ll8d9vkn06xb3r26kmc42fkl5xv1";
     };
@@ -46,15 +46,15 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-azurerm";
-      version = "0.1.6";
-      sha256  = "01hjr42gpkpwpz0chnkw8pf0yid0hqpdnfz65q5h2p8h627hg0c6";
+      version = "1.3.1";
+      sha256  = "1qpf2h9qnhki4lg9pv77r0sc4acj08m0fqqagkvkinq46ypsfbp4";
     };
   bitbucket =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-bitbucket";
-      version = "0.1.0";
-      sha256  = "0c5aiq0p425h7c600wg5h3601l40airwz6cs724lc72fycbb4s43";
+      version = "1.0.0";
+      sha256  = "0gi8p1q0y8x5y8lqihijkpqs3v152h0q7icv7ixk33xsdcvb418y";
     };
   chef =
     {
@@ -84,40 +84,47 @@
       version = "0.1.0";
       sha256  = "073j0kqkccj7yrqz6j4vx722vmy6mmvmgidamkjnhhjcwm6g1jbq";
     };
+  cloudscale =
+    {
+      owner   = "terraform-providers";
+      repo    = "terraform-provider-cloudscale";
+      version = "1.0.0";
+      sha256  = "0yqiz4xywbd3568hl6va8da81fbc1hnynlz4z0vqxgi3bs8hhdhz";
+    };
   cloudstack =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-cloudstack";
-      version = "0.1.1";
-      sha256  = "09iqxpc5a6938qj1js2y9s4dcgk7hw69xga56ixpbbknms2yrhnb";
+      version = "0.1.4";
+      sha256  = "1dj6zkwv0bix31b8sjad9gil43m8c2c5d1dr10qza40f9z4agaxa";
     };
   cobbler =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-cobbler";
-      version = "0.1.0";
-      sha256  = "1867aqlz1v7scybaia9yakaxw76lh6y2whhajv5pqy1ng58rcgiz";
+      version = "1.0.1";
+      sha256  = "1z0iijfrbbdrgszvc7jlcr4105zragbc0iq8x48vi24yipqgf5a8";
     };
   consul =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-consul";
-      version = "0.1.0";
-      sha256  = "1d179m42iv2dy6wjzldllffwg6qxbg6gnvxrp6nzy75v7qp2aq94";
+      version = "1.0.0";
+      sha256  = "1008lrvdqn3kk8gwvq094nwknh00b429jmwi0hq4brick7vyvbvz";
     };
   datadog =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-datadog";
-      version = "0.1.0";
-      sha256  = "1k3p0zxffhabs1xb6aw9189vbmh3ax10q4xi1qgjfjvla22byqmk";
+      version = "1.0.3";
+      sha256  = "0nh2dww3hx6jrkcd9lq5hpnqr3grp9cmqi4nwmxlrc5azf8x0mii";
     };
   digitalocean =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-digitalocean";
-      version = "0.1.2";
-      sha256  = "0wn2bx9zk0fqvrn7a76rffin7f1b70p66h5bs9073szhr3zph7hg";
+      version = "0.1.3";
+      sha256  = "10crxciw7y2gnm8vqp007vw0k7c1a1xk2z2zsjr5rksk6qlnri4k";
     };
   dme =
     {
@@ -130,8 +137,8 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-dns";
-      version = "0.1.1";
-      sha256  = "0ccp02rbvfvrb808mg053q5y7ghvxsl7p1gzw7pkm934i6j90g9n";
+      version = "1.0.0";
+      sha256  = "05ismwpmpkv9qxn6g5i29y18s1pw4yf2pyvv9ak8hj8idh4z6gz2";
     };
   dnsimple =
     {
@@ -144,71 +151,71 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-docker";
-      version = "0.1.0";
-      sha256  = "1nacxkyy12w4rj1bdf5ayqmmm47nwh362pcksr227rkwmsjlmg1m";
+      version = "0.1.1";
+      sha256  = "02lhbl34dq7lsby3g32969i4g9l3z6xw1v00shljd3amgyz2l2r2";
     };
   dyn =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-dyn";
-      version = "0.1.0";
-      sha256  = "1w727r2gz5hjmbzw9zir0n5nrr818adh4qj50n3vijqwbxciyq2p";
+      version = "1.1.0";
+      sha256  = "0sx4h3drb230m69lsmafyfd2cfvwnb9gld8s6ky54115kd3nckml";
     };
   external =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-external";
-      version = "0.1.0";
-      sha256  = "160f0avv6wbh11z54wy0qcq0zrcj4s31kn7a9x6zikv7v4hfnbza";
+      version = "1.0.0";
+      sha256  = "1sh0m8d6wp76h1b89j820yl3caji0f0wlgq3pwa5nk99h73rlndn";
     };
   fastly =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-fastly";
-      version = "0.1.2";
-      sha256  = "1z7nsgqqzvily9rxr79yjv6jfx56896c9lxb8flmzwjz6b6mvnz7";
+      version = "0.1.4";
+      sha256  = "0x8s11c30k9a95mafyb2zl3wh9hgbdm7jgajzy5y4xnnr96ca13k";
     };
   github =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-github";
-      version = "0.1.1";
-      sha256  = "0f6nk9nb8h8247rz7x1w11amp0qdcmy1alr8jgd2chrjv9f8nif0";
+      version = "1.0.0";
+      sha256  = "0nca90s4bangraly1pcn3jfkfksaw0g2chs5ba6m7z6bhkrj2ylb";
     };
   gitlab =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-gitlab";
-      version = "0.1.0";
-      sha256  = "1xjhpaq2agdshrl5jbq9ak2nxdy86iay5bw16zww2qc5ah21sdg2";
+      version = "1.0.0";
+      sha256  = "1kxmzdzdb6fc64i2bzch6020zfk0ygms9gh5mm1bypsyqmj4qc6r";
     };
   google =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-google";
-      version = "0.1.3";
-      sha256  = "1aa1hz0yc4g746m6dl04hc70rcrzx0py8kpdch3kim475bspclnf";
+      version = "1.8.0";
+      sha256  = "1n01gj9572hhskbl4bsg0fqyg9slv8fpvzp3avmwvg5b2hsj4snh";
     };
   grafana =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-grafana";
-      version = "0.1.0";
-      sha256  = "1m2anc5cyn2p3yh4zn0y6wvzb0s2fz3sfdqm9psvx53266c2c81q";
+      version = "1.0.1";
+      sha256  = "1dvd7dy039ranlkvnbililk2lzr6cffwc4jsgs6lk3hfxhrq8bns";
     };
   heroku =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-heroku";
-      version = "0.1.0";
-      sha256  = "1f72lm95bnkhaf2accypdn7xsxcgkqri5fq5mriya4n34c61z3l6";
+      version = "0.1.2";
+      sha256  = "0dmq5v4bwzndy6l6vx29m5ykn2zhnnbmnla00ad8i7djm1sj1fbg";
     };
   http =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-http";
-      version = "0.1.0";
-      sha256  = "1iy5fsl1j4wswbajnw0k6lagc2sz52idnswj1vmfc66x87ls0mah";
+      version = "1.0.1";
+      sha256  = "1bnqrx4xya3lm5wp4byy6npazll6w1g6bv4rawgncswsgx08zqng";
     };
   icinga2 =
     {
@@ -221,22 +228,22 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-ignition";
-      version = "0.2.0";
-      sha256  = "07qsyjzbz34nh7qrmw97sg0zrqbchky9r3ywrdz96pmpr1yjmwr7";
+      version = "1.0.0";
+      sha256  = "0hr2zshrx4qfb7xdknsxsa4522kkf84rsqqbliz7ac9nsqpaarf4";
     };
   influxdb =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-influxdb";
-      version = "0.1.0";
-      sha256  = "0msc6maxsiwmsg8ppdfj1397c66llhaf15nc4hmr2h6dxqkb5wl5";
+      version = "1.0.0";
+      sha256  = "1w1izzs22b2w2qmpdxbhaj9kvnfyw0wlq3nigrigwwvqav43knh9";
     };
   kubernetes =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-kubernetes";
-      version = "1.0.0";
-      sha256  = "1kh7a83f98v6b4v3zj84ddhrg2hya4nmvrw0mjc26q12g4z2d5g6";
+      version = "1.1.0";
+      sha256  = "1lhdmglc6nd24ss7z41qqbpsiy71ajvixhq4pfiq0b19hwj6awgn";
     };
   librato =
     {
@@ -249,8 +256,8 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-local";
-      version = "0.1.0";
-      sha256  = "02m0wg0jasnzrayamjsc2hzi0ibj83v4d0hmw2xbrxk7vmk71lgq";
+      version = "1.1.0";
+      sha256  = "1qxfyyg8k43rw0gny4dadamc2a9hk3x6ybdivifjc17m7il0janc";
     };
   logentries =
     {
@@ -258,6 +265,13 @@
       repo    = "terraform-provider-logentries";
       version = "0.1.0";
       sha256  = "11fkb84gqcq59wk5kqn3h428jrc2gkl659zxmkdldad6jdll9ypa";
+    };
+  logicmonitor =
+    {
+      owner   = "terraform-providers";
+      repo    = "terraform-provider-logicmonitor";
+      version = "1.1.0";
+      sha256  = "16blwfbvx80j5s6809wrlfnkq0qvjasz0zi4ykwzvkqxh00igj7r";
     };
   mailgun =
     {
@@ -270,57 +284,64 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-mysql";
-      version = "0.1.0";
-      sha256  = "0vjr97xf15va9qypjb9318h1nxr0sd6ydcy7ijnqb8538v3581mv";
+      version = "1.1.0";
+      sha256  = "06alk5vd20wzf493dw8hb80q0sx0kw4j8g1sd0193fhni0k4rflw";
     };
   newrelic =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-newrelic";
-      version = "0.1.1";
-      sha256  = "1fqgxcspkgm3ncsqbvw79h5n09agba7q80nz0mrq09x0pyk8y051";
+      version = "1.0.0";
+      sha256  = "1bcxq4f50qci54gckx4yax2v2qpazp10n5vcci4cba0bf5l8zx62";
     };
   nomad =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-nomad";
-      version = "0.1.0";
-      sha256  = "03sb31l59hxpp6zmnizxdm21jipz4mrzz9czk6ahhx7c8q0n0na8";
+      version = "1.2.0";
+      sha256  = "1z3knyjn5ymbk4vaja4ka9zn57cgl7vr7hqv6ybqw0q9i2ykaici";
     };
   ns1 =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-ns1";
-      version = "0.1.0";
-      sha256  = "1in9ggrvxfb3maxhgiv997hndkpnqpgx1c1365lfizhp7km5ncvj";
+      version = "1.0.0";
+      sha256  = "0zjdhz6miwlg3b68pbd99c6nw7hhyzxy736734xz8g3w89xn18f5";
     };
   null =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-null";
-      version = "0.1.0";
-      sha256  = "069yhsqi4jc14cay1gk7mwwmrg8xv90kj1k5qy3a2ypfbss4fcjp";
+      version = "1.0.0";
+      sha256  = "12vpa09xrq8z1pjq0bwzq3889c4fl6c5kvynwqy0z1pdx21m60ha";
     };
   oneandone =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-oneandone";
-      version = "0.1.0";
-      sha256  = "18bbpcprjib4d4skjdr76xjxi9091h5b3dls68y6bxkk6sh6av1i";
+      version = "1.0.0";
+      sha256  = "0q14r36iyn1c1wfky42imkzvkys5znj1yzq27iaxnrsqp4hh7pl2";
     };
   opc =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-opc";
-      version = "0.1.2";
-      sha256  = "0c4ywav89lln9417zwflrp3qhcs7qf96rgcvm1msmpgglrhzwp2i";
+      version = "1.1.0";
+      sha256  = "19yip5v00b57j3h7870hw51nsxcwib7mlhdzzn276z74af6zirsr";
     };
   openstack =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-openstack";
-      version = "0.2.1";
-      sha256  = "1zsswsgv7lzhfd0v8llbm18gsfg6xji0r3f9rnvpjqkffj4088ca";
+      version = "1.3.0";
+      sha256  = "0pyp95i6z6il2kl28cvilqi81wqs076d6f0zacjyvmn1d0blqrnx";
+    };
+  opentelekomcloud =
+    {
+      owner   = "terraform-providers";
+      repo    = "terraform-provider-opentelekomcloud";
+      version = "1.0.0";
+      sha256  = "1wra9a6cjgsyvbfldvi2xnjk6y9zqv3y06pbq8c8dyjzssd5j591";
     };
   opsgenie =
     {
@@ -329,33 +350,47 @@
       version = "0.1.0";
       sha256  = "0zs0cl6jl4rijcs6vv5k8k5pyf0zs52dlgqcnb1gzslh8sg5pdkm";
     };
+  oraclepaas =
+    {
+      owner   = "terraform-providers";
+      repo    = "terraform-provider-oraclepaas";
+      version = "1.0.0";
+      sha256  = "1h66ijnq172zk0bkv68iq0sy5l6jlasa2pi9q8fq54ib9sxnfkk2";
+    };
   ovh =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-ovh";
-      version = "0.1.0";
-      sha256  = "052bnfw146h9nh3cw77clwwxbmw1gvaich2yw39v4b1ca8brm5dr";
+      version = "0.2.0";
+      sha256  = "12dpgx0fpmqw64v5a70fihbgixyw71bdjbdi17gal7s2pj1xw159";
     };
   packet =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-packet";
-      version = "0.1.0";
-      sha256  = "0dk10d4b10pdlhqgm6fqg0cn0ff78ss1x76inj6gfwrnbn2amhp0";
+      version = "1.2.0";
+      sha256  = "0jk8wwm7srjxc3mspqd9szlq8fd63bhdgkzwdjr2fvv4ivj17xp4";
     };
   pagerduty =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-pagerduty";
-      version = "0.1.2";
-      sha256  = "1dqzi53bnk4qcjhlimr13352nzb1nsij7354zapz2sgnz21v89mm";
+      version = "1.0.0";
+      sha256  = "113anbcpp8ab111jm19h7d9i5sds76msgnk8xvwk8qf6500ivfqa";
+    };
+  panos =
+    {
+      owner   = "terraform-providers";
+      repo    = "terraform-provider-panos";
+      version = "1.0.0";
+      sha256  = "1pslp8pas1p90bmxp1yqmackqkbxrw2sgcm88ibz8l4k43vwks76";
     };
   postgresql =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-postgresql";
-      version = "0.1.0";
-      sha256  = "0gg48b2zn18ynvhnabvyfvw5wif0m1a852798wahv8fbv5d1vh7j";
+      version = "0.1.1";
+      sha256  = "0ls5z02vaalcrbaq375qnk0267pb17rpsx4s3plfnr7qclv21pwn";
     };
   powerdns =
     {
@@ -368,29 +403,29 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-profitbricks";
-      version = "0.1.2";
-      sha256  = "105l0rijqmp7kmd7wygnhnj02q7y1rz0r8pj2mjzncb5pr48m3qp";
+      version = "1.1.1";
+      sha256  = "0sn48adgpjw20a6jwagarnh5jasq0v36zsbd204j0vx4iam3vm9m";
     };
   rabbitmq =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-rabbitmq";
-      version = "0.1.0";
-      sha256  = "0vn8456f2al1f6rs1gn157c86qz1fxz8sqphbr9lvdhy1jw1q2vp";
+      version = "0.2.0";
+      sha256  = "1pbib43d1iqy8xl03zqwnz77362cb9cq8awcpid714n1sz7nd4im";
     };
   rancher =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-rancher";
-      version = "0.2.0";
-      sha256  = "05aci6cjrs7rv6hqhvcqy1i0nr8azds8flnrc7vba0nyy6v192qg";
+      version = "1.2.0";
+      sha256  = "0xxff4mh4cv27mignvanhsz5sf5476ljk7q4h67fy4y0gzyxwpzw";
     };
   random =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-random";
-      version = "0.1.0";
-      sha256  = "1lbv5yiw4qfsqm3gxf37gwadgp7g6ki0n70mj00d8l6v6jd0mdl5";
+      version = "1.1.0";
+      sha256  = "1mal0pg37a99q0sjqbccwc2ipwvxm8lqp93lg8i96f868hiv4yzl";
     };
   rundeck =
     {
@@ -403,8 +438,8 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-scaleway";
-      version = "0.1.1";
-      sha256  = "145wfcr5zjjk8vgx5xjf1hqh6h8jqxkhxbvv9x1w34i5bv809ch6";
+      version = "1.2.0";
+      sha256  = "123rjvslq7gy2m96rikm0i2298jjpsnyh9civbyvbxj3h47z9h4v";
     };
   softlayer =
     {
@@ -431,29 +466,29 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-template";
-      version = "0.1.1";
-      sha256  = "1qrslnkvcj18jzxmsbf72gm54s8dnw5k5z15nffwgy09vv7mzpcn";
+      version = "1.0.0";
+      sha256  = "0jl6bp6gwg96sdk5j6s13vv1j9gxjpy2yva3barmzv9138i665mz";
     };
   terraform =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-terraform";
-      version = "0.1.0";
-      sha256  = "1w465853gwffpydb7idvg7bk8ygadgy08s04fxsqc8i2683jbpiz";
+      version = "1.0.2";
+      sha256  = "1aj6g6l68n9kqmxfjlkwwxnac7fhha6wrmvsw4yylf0qyssww75v";
     };
   tls =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-tls";
-      version = "0.1.0";
-      sha256  = "1n1k4dcqm8lp7mgj88xj8xc09mn769np4wg3cggnpcs6igbgdgg7";
+      version = "1.1.0";
+      sha256  = "1kzq6al9rzpmk98bmxcf5gjx5s28gfjp1xvdsnd4a113pljn0ddb";
     };
   triton =
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-triton";
-      version = "0.1.2";
-      sha256  = "1jyrmc7932w7d8q96lmd0axf32psfic5d7hmwm1a25vzjzfn9nlw";
+      version = "0.4.2";
+      sha256  = "0nid5sp8xskw5wmc0dbkw6m87bmyb37p9ck9xm74nrvdzqjxz5ml";
     };
   ultradns =
     {
@@ -466,8 +501,8 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-vault";
-      version = "0.1.0";
-      sha256  = "1rr4gaqfr6panjjdb5xx9vbq7701zjps0l75zi526kij1pph98p1";
+      version = "1.0.0";
+      sha256  = "1v4b8zs0s48gqgsh719hwi69i4h8i5vvp2g5m881z5yzv7n7haqw";
     };
   vcd =
     {
@@ -480,7 +515,7 @@
     {
       owner   = "terraform-providers";
       repo    = "terraform-provider-vsphere";
-      version = "0.2.2";
-      sha256  = "0d5d4wip57zmv9kqh4zr9mz8ylffa2qcf1vmx827rwyqdr25xvaz";
+      version = "1.3.3";
+      sha256  = "1z6v8hagpjm8573d36v3nak5h7hn3jyq2f4m93k1adygvs3n9yx7";
     };
 }

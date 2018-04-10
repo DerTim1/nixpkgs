@@ -1,4 +1,4 @@
-{stdenv, fetchFromGitHub, fetchurl, pkgconfig, libusb, readline, libewf, perl, zlib, openssl,
+{stdenv, fetchFromGitHub, fetchgit, fetchurl, fetchpatch, pkgconfig, libusb, readline, libewf, perl, zlib, openssl, git,
 gtk2 ? null, vte ? null, gtkdialog ? null,
 python ? null,
 ruby ? null,
@@ -13,45 +13,38 @@ let
   inherit (stdenv.lib) optional;
 in
 stdenv.mkDerivation rec {
-  version = "1.6.0";
+  version = "2.4.0";
   name = "radare2-${version}";
 
   src = fetchFromGitHub {
     owner = "radare";
     repo = "radare2";
     rev = version;
-    sha256 = "0kb7y0b5kw2p1kxpzjgc8pnwdkqyzkijzp5d2a9zs2ira96668zd";
+    sha256 = "08zvxgsvc6rqpjaapcxz1wm9vzlrbsqgplfkx0lch2s67v6slr7z";
   };
 
   postPatch = let
-    cs_ver = "3.0.4"; # version from $sourceRoot/shlr/Makefile
-    capstone = fetchurl {
-      url = "https://github.com/aquynh/capstone/archive/${cs_ver}.tar.gz";
-      sha256 = "1whl5c8j6vqvz2j6ay2pyszx0jg8d3x8hq66cvgghmjchvsssvax";
+    cs_tip = "4a1b580d069c82d60070d0869a87000db7cdabe2"; # version from $sourceRoot/shlr/Makefile
+    capstone = fetchgit {
+      url = "https://github.com/aquynh/capstone.git";
+      rev = cs_tip;
+      sha256 = "1b126npshdbwh5y7rafmb9w4dzlvxsf4ca6bx4zs2y7kbk48jyn8";
+      leaveDotGit = true;
     };
   in ''
-    if ! grep -F "CS_VER=${cs_ver}" shlr/Makefile; then echo "CS_VER mismatch"; exit 1; fi
-    substituteInPlace shlr/Makefile --replace CS_RELEASE=0 CS_RELEASE=1
-    cp ${capstone} shlr/capstone-${cs_ver}.tar.gz
-
-    # make compiler happy (fixed in upstream 2017-08-11)
-    substituteInPlace libr/asm/arch/hexagon/gnu/hexagon-dis.c --replace \
-      '(*info->fprintf_func) (info->stream, errmsg);' \
-      '(*info->fprintf_func) (info->stream, "%s", errmsg);'
+    if ! grep -F "CS_TIP=${cs_tip}" shlr/Makefile; then echo "CS_TIP mismatch"; exit 1; fi
+    cp -r ${capstone} shlr/capstone
+    chmod -R u+rw shlr/capstone
   '';
 
-  buildInputs = [pkgconfig readline libusb libewf perl zlib openssl]
+  enableParallelBuilding = true;
+
+  nativeBuildInputs = [ pkgconfig git ];
+  buildInputs = [ readline libusb libewf perl zlib openssl]
     ++ optional useX11 [gtkdialog vte gtk2]
     ++ optional rubyBindings [ruby]
     ++ optional pythonBindings [python]
     ++ optional luaBindings [lua];
-
-  postInstall = ''
-    # replace symlinks pointing into the build directory with the files they point to
-    rm $out/bin/{r2-docker,r2-indent}
-    cp sys/r2-docker.sh $out/bin/r2-docker
-    cp sys/indent.sh    $out/bin/r2-indent
-  '';
 
   meta = {
     description = "unix-like reverse engineering framework and commandline tools";

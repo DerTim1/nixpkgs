@@ -3,7 +3,8 @@
 , glib, gmp, gtk2, libedit, libffi, libjpeg
 , libpng, libtool, mpfr, openssl, pango, poppler
 , readline, sqlite
-, disableDocs ? true
+, disableDocs ? false
+, CoreFoundation
 }:
 
 let
@@ -33,18 +34,27 @@ in
 
 stdenv.mkDerivation rec {
   name = "racket-${version}";
-  version = "6.10";
+  version = "6.12";
 
-  src = fetchurl {
-    url = "http://mirror.racket-lang.org/installers/${version}/${name}-src.tgz";
-    sha256 = "1mqnyj3bawad12dygsb11f2dbnkjp7q6d7ra714rqyw8mxix5ws0";
+  src = (stdenv.lib.makeOverridable ({ name, sha256 }:
+    fetchurl rec {
+      url = "https://mirror.racket-lang.org/installers/${version}/${name}-src.tgz";
+      inherit sha256;
+    }
+  )) {
+    inherit name;
+    sha256 = "0cwcypzjfl9py1s695mhqkiapff7c1w29llsmdj7qgn58wl0apk5";
   };
 
   FONTCONFIG_FILE = fontsConf;
   LD_LIBRARY_PATH = libPath;
-  NIX_LDFLAGS = stdenv.lib.optionalString stdenv.cc.isGNU "-lgcc_s";
+  NIX_LDFLAGS = stdenv.lib.concatStringsSep " " [
+    (stdenv.lib.optionalString (stdenv.cc.isGNU && ! stdenv.isDarwin) "-lgcc_s")
+    (stdenv.lib.optionalString stdenv.isDarwin "-framework CoreFoundation")
+  ];
 
-  buildInputs = [ fontconfig libffi libtool makeWrapper sqlite ];
+  buildInputs = [ fontconfig libffi libtool makeWrapper sqlite ]
+    ++ stdenv.lib.optionals stdenv.isDarwin [ CoreFoundation ];
 
   preConfigure = ''
     unset AR
@@ -82,6 +92,6 @@ stdenv.mkDerivation rec {
     homepage = http://racket-lang.org/;
     license = licenses.lgpl3;
     maintainers = with maintainers; [ kkallio henrytill vrthra ];
-    platforms = platforms.x86_64;
+    platforms = [ "x86_64-linux" ];
   };
 }

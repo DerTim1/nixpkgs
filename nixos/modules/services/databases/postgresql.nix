@@ -122,7 +122,7 @@ in
       extraPlugins = mkOption {
         type = types.listOf types.path;
         default = [];
-        example = literalExample "[ (pkgs.postgis.override { postgresql = pkgs.postgresql94; }).v_2_1_4 ]";
+        example = literalExample "[ (pkgs.postgis.override { postgresql = pkgs.postgresql94; }) ]";
         description = ''
           When this list contains elements a new store path is created.
           PostgreSQL and the elements are symlinked into it. Then pg_config,
@@ -153,7 +153,7 @@ in
         default= if versionAtLeast config.system.stateVersion "17.09" then "postgres" else "root";
         internal = true;
         description = ''
-          NixOS traditionally used `root` as superuser, most other distros use `postgres`.
+          NixOS traditionally used 'root' as superuser, most other distros use 'postgres'.
           From 17.09 we also try to follow this standard. Internal since changing this value
           would lead to breakage while setting up databases.
         '';

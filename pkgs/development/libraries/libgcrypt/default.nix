@@ -1,14 +1,16 @@
-{ stdenv, fetchurl, fetchpatch, libgpgerror, enableCapabilities ? false, libcap }:
+{ stdenv, fetchurl, gettext, libgpgerror, enableCapabilities ? false, libcap
+, buildPackages
+}:
 
 assert enableCapabilities -> stdenv.isLinux;
 
 stdenv.mkDerivation rec {
   name = "libgcrypt-${version}";
-  version = "1.8.0";
+  version = "1.8.2";
 
   src = fetchurl {
     url = "mirror://gnupg/libgcrypt/${name}.tar.bz2";
-    sha256 = "06w97l88y2c29zf8p8cg0m4k2kiiyj6pqxdl0cxigi3wp2brdr13";
+    sha256 = "01sca9m8hm6b5v8hmqsfdjhyz013869p1f0fxw9ln52qfnp4q1n8";
   };
 
   outputs = [ "out" "dev" "info" ];
@@ -19,17 +21,18 @@ stdenv.mkDerivation rec {
   # The build enables -O2 by default for everything else.
   hardeningDisable = stdenv.lib.optional stdenv.cc.isClang "fortify";
 
+  depsBuildBuild = [ buildPackages.stdenv.cc ];
+
   buildInputs = [ libgpgerror ]
+    ++ stdenv.lib.optional stdenv.isDarwin gettext
     ++ stdenv.lib.optional enableCapabilities libcap;
 
-  # Shouldn't be needed after 1.8.1
-  patches = if stdenv.isArm && stdenv.system != "armv7l-linux"
-    then fetchpatch {
-        url = "https://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgcrypt.git;a=patch;h=4a7aa30ae9f3ce798dd886c2f2d4164c43027748";
-        name = "arm.patch";
-        sha256 = "1dq9s0xwpbg7s5sghvssmwh4v88x733zm6c8ab3flllq8h7c8fq5";
-      }
-    else null;
+  preConfigure = stdenv.lib.optionalString stdenv.isCross ''
+    # This is intentional: gpg-error-config is a shell script that will work during the build
+    mkdir -p "$NIX_BUILD_TOP"/bin
+    ln -s ${libgpgerror.dev}/bin/gpg-error-config "$NIX_BUILD_TOP/bin"
+    export PATH="$NIX_BUILD_TOP/bin:$PATH"
+  '';
 
   # Make sure libraries are correct for .pc and .la files
   # Also make sure includes are fixed for callers who don't use libgpgcrypt-config

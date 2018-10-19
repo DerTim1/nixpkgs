@@ -112,8 +112,8 @@ in with pkgs; rec {
         cp -d ${gcc.cc.out}/bin/gcc $out/bin
         cp -d ${gcc.cc.out}/bin/cpp $out/bin
         cp -d ${gcc.cc.out}/bin/g++ $out/bin
-        cp -d ${gcc.cc.lib}/lib*/libgcc_s.so* $out/lib
-        cp -d ${gcc.cc.lib}/lib*/libstdc++.so* $out/lib
+        cp -d ${gcc.cc.lib}/lib/libgcc_s.so* $out/lib
+        cp -d ${gcc.cc.lib}/lib/libstdc++.so* $out/lib
         cp -rd ${gcc.cc.out}/lib/gcc $out/lib
         chmod -R u+w $out/lib
         rm -f $out/lib/gcc/*/*/include*/linux
@@ -136,8 +136,6 @@ in with pkgs; rec {
         cp -d ${libmpc.out}/lib/libmpc*.so* $out/lib
         cp -d ${zlib.out}/lib/libz.so* $out/lib
         cp -d ${libelf}/lib/libelf.so* $out/lib
-      '' + lib.optionalString (hostPlatform.libc == "musl") ''
-        cp -d ${libiconv.out}/lib/libiconv*.so* $out/lib
 
       '' + lib.optionalString (hostPlatform != buildPlatform) ''
         # These needed for cross but not native tools because the stdenv

@@ -7,20 +7,7 @@ gatherLibraries() {
 addEnvHooks "$targetOffset" gatherLibraries
 
 isExecutable() {
-    [ "$(file -b -N --mime-type "$1")" = application/x-executable ]
-}
-
-findElfs() {
-    find "$1" -type f -exec "$SHELL" -c '
-        while [ -n "$1" ]; do
-            mimeType="$(file -b -N --mime-type "$1")"
-            if [ "$mimeType" = application/x-executable \
-              -o "$mimeType" = application/x-sharedlib ]; then
-                echo "$1"
-            fi
-            shift
-        done
-    ' -- {} +
+    readelf -h "$1" 2> /dev/null | grep -q '^ *Type: *EXEC\>'
 }
 
 # We cache dependencies so that we don't need to search through all of them on
@@ -166,9 +153,24 @@ autoPatchelf() {
     # findDependency outside of this, the dependency cache needs to be rebuilt
     # from scratch, so keep this in mind if you want to run findDependency
     # outside of this function.
-    findElfs "$prefix" | while read -r elffile; do
-        autoPatchelfFile "$elffile"
-    done
+    while IFS= read -r -d $'\0' file; do
+      isELF "$file" || continue
+      if isExecutable "$file"; then
+          # Skip if the executable is statically linked.
+          readelf -l "$file" | grep -q "^ *INTERP\\>" || continue
+      fi
+      autoPatchelfFile "$file"
+    done < <(find "$prefix" -type f -print0)
 }
 
-fixupOutputHooks+=(autoPatchelf)
+# XXX: This should ultimately use fixupOutputHooks but we currently don't have
+# a way to enforce the order. If we have $runtimeDependencies set, the setup
+# hook of patchelf is going to ruin everything and strip out those additional
+# RPATHs.
+#
+# So what we do here is basically run in postFixup and emulate the same
+# behaviour as fixupOutputHooks because the setup hook for patchelf is run in
+# fixupOutput and the postFixup hook runs later.
+postFixupHooks+=(
+    'for output in $outputs; do prefix="${!output}" autoPatchelf; done'
+)

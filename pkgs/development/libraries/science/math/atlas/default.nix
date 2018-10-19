@@ -45,6 +45,8 @@
 
 let
   inherit (stdenv.lib) optional optionalString;
+  # Don't upgrade until https://github.com/math-atlas/math-atlas/issues/44
+  # is resolved.
   version = "3.10.3";
 in
 
@@ -108,6 +110,7 @@ stdenv.mkDerivation {
     homepage = http://math-atlas.sourceforge.net/;
     description = "Automatically Tuned Linear Algebra Software (ATLAS)";
     license = stdenv.lib.licenses.bsd3;
+    broken = stdenv.isDarwin;  # test when updating to >=3.10.3
     platforms = stdenv.lib.platforms.unix;
 
     longDescription = ''

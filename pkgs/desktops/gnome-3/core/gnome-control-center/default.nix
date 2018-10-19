@@ -5,22 +5,22 @@
 , cracklib, libkrb5, networkmanagerapplet, networkmanager, glibc
 , libwacom, samba, shared-mime-info, tzdata, libtool, libgnomekbd
 , docbook_xsl, modemmanager, clutter, clutter-gtk, cheese
-, fontconfig, sound-theme-freedesktop, grilo }:
+, fontconfig, sound-theme-freedesktop, grilo, python3 }:
 
 let
   pname = "gnome-control-center";
-  version = "3.28.0";
+  version = "3.28.2";
 in stdenv.mkDerivation rec {
   name = "${pname}-${version}";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/${pname}/${gnome3.versionBranch version}/${name}.tar.xz";
-    sha256 = "0nyx5nl2rky0249rdcy0hsccnxf3angpya0q859rrbrwaixqnxh3";
+    url = "mirror://gnome/sources/${pname}/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
+    sha256 = "0d6pjdbsra16nav8201kaadja5yma92bhziki9601ilk2ry3v7pz";
   };
 
   nativeBuildInputs = [
     meson ninja pkgconfig gettext wrapGAppsHook libtool libxslt docbook_xsl
-    shared-mime-info
+    shared-mime-info python3
   ];
 
   buildInputs = with gnome3; [

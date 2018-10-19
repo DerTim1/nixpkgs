@@ -3,14 +3,14 @@
 let
   common = { stname, target, patches ? [], postInstall ? "" }:
     stdenv.mkDerivation rec {
-      version = "0.14.46";
+      version = "0.14.51";
       name = "${stname}-${version}";
 
       src = fetchFromGitHub {
         owner  = "syncthing";
         repo   = "syncthing";
         rev    = "v${version}";
-        sha256 = "0lv8n5id40iy2gfccy8g45fjzlnbnvi7nlvj25pri22dq2bd5svm";
+        sha256 = "1ycly3vh10s04pk0fk9hb0my7w5b16dfgmnk1mi0zjylcii3yzi5";
       };
 
       inherit patches;

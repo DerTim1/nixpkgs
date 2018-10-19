@@ -1,6 +1,6 @@
 { stdenv, fetchurl
 , meson, ninja, gettext, pkgconfig, wrapGAppsHook, itstool, desktop-file-utils
-, vala, gobjectIntrospection, libxml2, gtk3, glib, gsound
+, vala, gobjectIntrospection, libxml2, gtk3, glib, gsound, sound-theme-freedesktop
 , gnome3, gdk_pixbuf, geoclue2, libgweather }:
 
 stdenv.mkDerivation rec {
@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
   version = "3.28.0";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/gnome-clocks/${gnome3.versionBranch version}/${name}.tar.xz";
+    url = "mirror://gnome/sources/gnome-clocks/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
     sha256 = "1dd739vchb592mck1dia2hkywn4213cpramyqzgmlmwv8z80p3nl";
   };
 
@@ -29,6 +29,13 @@ stdenv.mkDerivation rec {
     gtk3 glib gnome3.gsettings-desktop-schemas gdk_pixbuf gnome3.defaultIconTheme
     gnome3.gnome-desktop gnome3.geocode-glib geoclue2 libgweather gsound
   ];
+
+  preFixup = ''
+    gappsWrapperArgs+=(
+      # Fallback sound theme
+      --prefix XDG_DATA_DIRS : "${sound-theme-freedesktop}/share"
+    )
+  '';
 
   meta = with stdenv.lib; {
     homepage = https://wiki.gnome.org/Apps/Clocks;

@@ -1,4 +1,4 @@
-{ lib, callPackage, fetchurl, fetchpatch }:
+{ lib, callPackage, fetchurl }:
 
 let
   generic = args: callPackage (import ./generic.nix args) { };
@@ -17,17 +17,21 @@ in
 rec {
   # Policy: use the highest stable version as the default (on our master).
   stable = generic {
-    version = "390.48";
-    sha256_32bit = "1y6n2hfz9vd0h7gd31fgxcl76s5pjf8afwqyq5slqpcxpd78j5ai";
-    sha256_64bit = "16a3blvizcksmaxr644s857yanw3i3vcvqvn7qnwbsbqpmxga09c";
-    settingsSha256 = "058xaiw5g0kxrvc3lvy4424fqbjkvmsznj2v73cgbm25i1m83krl";
-    persistencedSha256 = "0y86bhzl42lqyrbibqzf8a8yd49zbq3ryb78vgsl13i44f9sl79k";
+    version = "390.87";
+    sha256_32bit = "0rlr1f4lnpb8c4qz4w5r8xw5gdy9bzz26qww45qyl1qav3wwaaaw";
+    sha256_64bit = "07k1kq8lkgbvjyr2dnbxcz6nppcwpq17wf925w8kfq78345hla9q";
+    settingsSha256 = "0xlaiy7jr95z0v2c6cwll89nxnb142pybw7m08jg44r7n13ffv3r";
+    persistencedSha256 = "0mhwk321garyl6m12261cj03ycv0qz1sbrlbq6cqwjpq4f1s7h58";
 
-    patches = [ ./fix_missing_symbol.patch ];
+    patches = lib.optional (kernel.meta.branch == "4.19") ./drm_mode_connector.patch;
   };
 
-  beta = stable; # not enough interest to maintain beta ATM
-
+  beta = generic {
+    version = "410.57";
+    sha256_64bit = "08534rv3wcmzslbwq11kd3s7cxm72p48dia6540c0586xwgjwg2w";
+    settingsSha256 = "1phhhzlc8n3rqdhrn757mnlqmsp616d079a6h1qjpa6jba9z9915";
+    persistencedSha256 = "1z7c1ff0y486yp9i5w0siwh9dnprml22x2avarbjfgqwm4f652lw";
+  };
 
   legacy_340 = generic {
     version = "340.104";

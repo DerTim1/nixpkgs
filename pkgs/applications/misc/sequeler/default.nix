@@ -1,10 +1,10 @@
 { stdenv, fetchFromGitHub
-, cmake, ninja, pkgconfig, vala, gobjectIntrospection, gettext, wrapGAppsHook
-, gtk3, glib, granite, libgee, libgda, gtksourceview, libxml2 }:
+, meson, ninja, pkgconfig, vala, gobjectIntrospection, gettext, wrapGAppsHook, python3, desktop-file-utils
+, gtk3, glib, granite, libgee, libgda, gtksourceview, libxml2, libsecret }:
 
 
 let
-  version = "0.5.4";
+  version = "0.6.2";
   sqlGda = libgda.override {
     mysqlSupport = true;
     postgresSupport = true;
@@ -17,12 +17,17 @@ in stdenv.mkDerivation rec {
     owner = "Alecaddd";
     repo = "sequeler";
     rev = "v${version}";
-    sha256 = "05c7y6xdyq3h9bn90pbz03jhy9kabmgpxi4zz0i26q0qphljskbx";
+    sha256 = "0j5z3z34jc1acclmlkjpv7fcs4f2gf0bcfnvcpn3zdzw9fzj0sw7";
   };
 
-  nativeBuildInputs = [ cmake ninja pkgconfig vala gobjectIntrospection gettext wrapGAppsHook ];
+  nativeBuildInputs = [ meson ninja pkgconfig vala gobjectIntrospection gettext wrapGAppsHook python3 desktop-file-utils ];
 
-  buildInputs = [ gtk3 glib granite libgee sqlGda gtksourceview libxml2 ];
+  buildInputs = [ gtk3 glib granite libgee sqlGda gtksourceview libxml2 libsecret ];
+
+  postPatch = ''
+    chmod +x meson/post_install.py
+    patchShebangs meson/post_install.py
+  '';
 
   meta = with stdenv.lib; {
     description = "Friendly SQL Client";

@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, pkgconfig, libusb1 }:
+{ stdenv, fetchurl, pkgconfig, libusb1, libiconv }:
 
 stdenv.mkDerivation rec {
   name = "libmtp-1.1.15";
@@ -10,13 +10,14 @@ stdenv.mkDerivation rec {
 
   outputs = [ "bin" "dev" "out" ];
 
+  buildInputs = [ libiconv ];
   propagatedBuildInputs = [ libusb1 ];
   nativeBuildInputs = [ pkgconfig ];
 
   # tried to install files to /lib/udev, hopefully OK
   configureFlags = [ "--with-udev=$$bin/lib/udev" ];
 
-  meta = {
+  meta = with stdenv.lib; {
     homepage = http://libmtp.sourceforge.net;
     description = "An implementation of Microsoft's Media Transfer Protocol";
     longDescription = ''
@@ -24,7 +25,7 @@ stdenv.mkDerivation rec {
       in the form of a library suitable primarily for POSIX compliant operating
       systems. We implement MTP Basic, the stuff proposed for standardization.
       '';
-    platforms = stdenv.lib.platforms.linux;
-    maintainers = [ ];
+    platforms = platforms.unix;
+    license = licenses.lgpl21;
   };
 }

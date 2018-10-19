@@ -8,9 +8,6 @@ let
   cfg = config.services.gitlab;
 
   ruby = cfg.packages.gitlab.ruby;
-  bundler = pkgs.bundler;
-
-  gemHome = "${cfg.packages.gitlab.rubyEnv}/${ruby.gemPath}";
 
   gitlabSocket = "${cfg.statePath}/tmp/sockets/gitlab.socket";
   gitalySocket = "${cfg.statePath}/tmp/sockets/gitaly.socket";
@@ -56,6 +53,7 @@ let
     repos_path: "${cfg.statePath}/repositories"
     secret_file: "${cfg.statePath}/config/gitlab_shell_secret"
     log_file: "${cfg.statePath}/log/gitlab-shell.log"
+    custom_hooks_dir: "${cfg.statePath}/custom_hooks"
     redis:
       bin: ${pkgs.redis}/bin/redis-cli
       host: 127.0.0.1
@@ -132,13 +130,12 @@ let
         };
       };
       extra = {};
+      uploads.storage_path = cfg.statePath;
     };
   };
 
   gitlabEnv = {
     HOME = "${cfg.statePath}/home";
-    GEM_HOME = gemHome;
-    BUNDLE_GEMFILE = "${cfg.packages.gitlab}/share/gitlab/Gemfile";
     UNICORN_PATH = "${cfg.statePath}/";
     GITLAB_PATH = "${cfg.packages.gitlab}/share/gitlab/";
     GITLAB_STATE_PATH = "${cfg.statePath}";
@@ -158,19 +155,17 @@ let
 
   gitlab-rake = pkgs.stdenv.mkDerivation rec {
     name = "gitlab-rake";
-    buildInputs = [ cfg.packages.gitlab cfg.packages.gitlab.rubyEnv pkgs.makeWrapper ];
-    phases = "installPhase fixupPhase";
-    buildPhase = "";
+    buildInputs = [ pkgs.makeWrapper ];
+    dontBuild = true;
+    unpackPhase = ":";
     installPhase = ''
       mkdir -p $out/bin
-      makeWrapper ${cfg.packages.gitlab.rubyEnv}/bin/bundle $out/bin/gitlab-bundle \
+      makeWrapper ${cfg.packages.gitlab.rubyEnv}/bin/rake $out/bin/gitlab-rake \
           ${concatStrings (mapAttrsToList (name: value: "--set ${name} '${value}' ") gitlabEnv)} \
           --set GITLAB_CONFIG_PATH '${cfg.statePath}/config' \
-          --set PATH '${lib.makeBinPath [ pkgs.nodejs pkgs.gzip pkgs.git pkgs.gnutar config.services.postgresql.package ]}:$PATH' \
+          --set PATH '${lib.makeBinPath [ pkgs.nodejs pkgs.gzip pkgs.git pkgs.gnutar config.services.postgresql.package pkgs.coreutils pkgs.procps ]}:$PATH' \
           --set RAKEOPT '-f ${cfg.packages.gitlab}/share/gitlab/Rakefile' \
           --run 'cd ${cfg.packages.gitlab}/share/gitlab'
-      makeWrapper $out/bin/gitlab-bundle $out/bin/gitlab-rake \
-          --add-flags "exec rake"
      '';
   };
 
@@ -209,6 +204,7 @@ in {
         default = pkgs.gitlab;
         defaultText = "pkgs.gitlab";
         description = "Reference to the gitlab package";
+        example = "pkgs.gitlab-ee";
       };
 
       packages.gitlab-shell = mkOption {
@@ -450,7 +446,7 @@ in {
     # Use postfix to send out mails.
     services.postfix.enable = mkDefault true;
 
-    users.extraUsers = [
+    users.users = [
       { name = cfg.user;
         group = cfg.group;
         home = "${cfg.statePath}/home";
@@ -459,7 +455,7 @@ in {
       }
     ];
 
-    users.extraGroups = [
+    users.groups = [
       { name = cfg.group;
         gid = config.ids.gids.gitlab;
       }
@@ -482,10 +478,10 @@ in {
         Type = "simple";
         User = cfg.user;
         Group = cfg.group;
-        TimeoutSec = "300";
+        TimeoutSec = "infinity";
         Restart = "on-failure";
         WorkingDirectory = "${cfg.packages.gitlab}/share/gitlab";
-        ExecStart="${cfg.packages.gitlab.rubyEnv}/bin/bundle exec \"sidekiq -C \"${cfg.packages.gitlab}/share/gitlab/config/sidekiq_queues.yml\" -e production -P ${cfg.statePath}/tmp/sidekiq.pid\"";
+        ExecStart="${cfg.packages.gitlab.rubyEnv}/bin/sidekiq -C \"${cfg.packages.gitlab}/share/gitlab/config/sidekiq_queues.yml\" -e production -P ${cfg.statePath}/tmp/sidekiq.pid";
       };
     };
 
@@ -493,11 +489,9 @@ in {
       after = [ "network.target" "gitlab.service" ];
       wantedBy = [ "multi-user.target" ];
       environment.HOME = gitlabEnv.HOME;
-      environment.GEM_HOME = "${cfg.packages.gitaly.rubyEnv}/${ruby.gemPath}";
       environment.GITLAB_SHELL_CONFIG_PATH = gitlabEnv.GITLAB_SHELL_CONFIG_PATH;
-      path = with pkgs; [ gitAndTools.git cfg.packages.gitaly.rubyEnv ruby ];
+      path = with pkgs; [ gitAndTools.git cfg.packages.gitaly.rubyEnv cfg.packages.gitaly.rubyEnv.wrappedRuby ];
       serviceConfig = {
-        #PermissionsStartOnly = true; # preStart must be run as root
         Type = "simple";
         User = cfg.user;
         Group = cfg.group;
@@ -509,7 +503,7 @@ in {
     };
 
     systemd.services.gitlab-workhorse = {
-      after = [ "network.target" "gitlab.service" ];
+      after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
       environment.HOME = gitlabEnv.HOME;
       environment.GITLAB_SHELL_CONFIG_PATH = gitlabEnv.GITLAB_SHELL_CONFIG_PATH;
@@ -529,7 +523,7 @@ in {
         Type = "simple";
         User = cfg.user;
         Group = cfg.group;
-        TimeoutSec = "300";
+        TimeoutSec = "infinity";
         Restart = "on-failure";
         WorkingDirectory = gitlabEnv.HOME;
         ExecStart =
@@ -568,20 +562,21 @@ in {
         mkdir -p ${cfg.statePath}/tmp/sockets
         mkdir -p ${cfg.statePath}/shell
         mkdir -p ${cfg.statePath}/db
+        mkdir -p ${cfg.statePath}/uploads
+        mkdir -p ${cfg.statePath}/custom_hooks/pre-receive.d
+        mkdir -p ${cfg.statePath}/custom_hooks/post-receive.d
+        mkdir -p ${cfg.statePath}/custom_hooks/update.d
 
         rm -rf ${cfg.statePath}/config ${cfg.statePath}/shell/hooks
         mkdir -p ${cfg.statePath}/config
 
         ${pkgs.openssl}/bin/openssl rand -hex 32 > ${cfg.statePath}/config/gitlab_shell_secret
 
-        # The uploads directory is hardcoded somewhere deep in rails. It is
-        # symlinked in the gitlab package to /run/gitlab/uploads to make it
-        # configurable
         mkdir -p /run/gitlab
-        mkdir -p ${cfg.statePath}/{log,uploads}
-        ln -sf ${cfg.statePath}/log /run/gitlab/log
-        ln -sf ${cfg.statePath}/uploads /run/gitlab/uploads
-        ln -sf ${cfg.statePath}/tmp /run/gitlab/tmp
+        mkdir -p ${cfg.statePath}/log
+        [ -d /run/gitlab/log ] || ln -sf ${cfg.statePath}/log /run/gitlab/log
+        [ -d /run/gitlab/tmp ] || ln -sf ${cfg.statePath}/tmp /run/gitlab/tmp
+        [ -d /run/gitlab/uploads ] || ln -sf ${cfg.statePath}/uploads /run/gitlab/uploads
         ln -sf $GITLAB_SHELL_CONFIG_PATH /run/gitlab/shell-config.yml
         chown -R ${cfg.user}:${cfg.group} /run/gitlab
 
@@ -596,6 +591,10 @@ in {
           ln -sf ${smtpSettings} ${cfg.statePath}/config/initializers/smtp_settings.rb
         ''}
         ln -sf ${cfg.statePath}/config /run/gitlab/config
+        if [ -e ${cfg.statePath}/lib ]; then
+          rm ${cfg.statePath}/lib
+        fi
+        ln -sf ${pkgs.gitlab}/share/gitlab/lib ${cfg.statePath}/lib
         cp ${cfg.packages.gitlab}/share/gitlab/VERSION ${cfg.statePath}/VERSION
 
         # JSON is a subset of YAML
@@ -618,10 +617,11 @@ in {
             ${pkgs.sudo}/bin/sudo -u ${pgSuperUser} ${config.services.postgresql.package}/bin/createdb --owner ${cfg.databaseUsername} ${cfg.databaseName}
             touch "${cfg.statePath}/db-created"
           fi
+
+          # enable required pg_trgm extension for gitlab
+          ${pkgs.sudo}/bin/sudo -u ${pgSuperUser} psql ${cfg.databaseName} -c "CREATE EXTENSION IF NOT EXISTS pg_trgm"
         fi
 
-        # enable required pg_trgm extension for gitlab
-        ${pkgs.sudo}/bin/sudo -u ${pgSuperUser} psql ${cfg.databaseName} -c "CREATE EXTENSION IF NOT EXISTS pg_trgm"
         # Always do the db migrations just to be sure the database is up-to-date
         ${gitlab-rake}/bin/gitlab-rake db:migrate RAILS_ENV=production
 
@@ -633,6 +633,10 @@ in {
             GITLAB_ROOT_PASSWORD='${cfg.initialRootPassword}' GITLAB_ROOT_EMAIL='${cfg.initialRootEmail}'
           touch "${cfg.statePath}/db-seeded"
         fi
+
+        # The gitlab:shell:setup regenerates the authorized_keys file so that
+        # the store path to the gitlab-shell in it gets updated
+        ${pkgs.sudo}/bin/sudo -u ${cfg.user} force=yes ${gitlab-rake}/bin/gitlab-rake gitlab:shell:setup RAILS_ENV=production
 
         # The gitlab:shell:create_hooks task seems broken for fixing links
         # so we instead delete all the hooks and create them anew
@@ -647,10 +651,6 @@ in {
         chmod -R ug+rwX,o-rwx ${cfg.statePath}/repositories
         chmod -R ug-s ${cfg.statePath}/repositories
         find ${cfg.statePath}/repositories -type d -print0 | xargs -0 chmod g+s
-        chmod 770 ${cfg.statePath}/uploads
-        chown -R ${cfg.user} ${cfg.statePath}/uploads
-        find ${cfg.statePath}/uploads -type f -exec chmod 0644 {} \;
-        find ${cfg.statePath}/uploads -type d -not -path ${cfg.statePath}/uploads -exec chmod 0770 {} \;
       '';
 
       serviceConfig = {
@@ -658,10 +658,10 @@ in {
         Type = "simple";
         User = cfg.user;
         Group = cfg.group;
-        TimeoutSec = "300";
+        TimeoutSec = "infinity";
         Restart = "on-failure";
         WorkingDirectory = "${cfg.packages.gitlab}/share/gitlab";
-        ExecStart = "${cfg.packages.gitlab.rubyEnv}/bin/bundle exec \"unicorn -c ${cfg.statePath}/config/unicorn.rb -E production\"";
+        ExecStart = "${cfg.packages.gitlab.rubyEnv}/bin/unicorn -c ${cfg.statePath}/config/unicorn.rb -E production";
       };
 
     };

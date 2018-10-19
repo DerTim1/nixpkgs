@@ -2,7 +2,7 @@
 
 { mkDerivation, lib, fetchgit, fetchsvn
 , pkgconfig, pythonPackages, cmake, wrapGAppsHook
-, qtbase, qtimageformats, gtk3, libappindicator-gtk3, libnotify
+, qtbase, qtimageformats, gtk3, libappindicator-gtk3, libnotify, xdg_utils
 , dee, ffmpeg, openalSoft, minizip, libopus, alsaLib, libpulseaudio, range-v3
 }:
 
@@ -28,7 +28,10 @@ mkDerivation rec {
   };
 
   # TODO: libtgvoip.patch no-gtk2.patch
-  patches = [ "${archPatches}/tdesktop.patch" ];
+  patches = [ "${archPatches}/tdesktop.patch" ]
+    # TODO: Only required to work around a compiler bug.
+    # This should be fixed in GCC 7.3.1 (or later?)
+    ++ [ ./fix-internal-compiler-error.patch ];
 
   postPatch = ''
     substituteInPlace Telegram/SourceFiles/platform/linux/linux_libs.cpp \
@@ -90,6 +93,10 @@ mkDerivation rec {
     sed -i Telegram/gyp/qt_rcc.gypi \
       -e "s,/usr/bin/rcc,rcc,g"
 
+    # Build system assumes x86, but it works fine on non-x86 if we patch this one flag out
+    sed -i Telegram/ThirdParty/libtgvoip/libtgvoip.gyp \
+      -e "/-msse2/d"
+
     gyp \
       -Dbuild_defines=${GYP_DEFINES} \
       -Gconfig=Release \
@@ -114,7 +121,7 @@ mkDerivation rec {
     install -m444 "$src/lib/xdg/telegramdesktop.desktop" "$out/share/applications/telegram-desktop.desktop"
     sed "s,/usr/bin,$out/bin,g" $archPatches/tg.protocol > $out/share/kde4/services/tg.protocol
     for icon_size in 16 32 48 64 128 256 512; do
-      install -Dm644 "../../../Telegram/Resources/art/icon''${icon_size}.png" "$out/share/icons/hicolor/''${icon_size}x''${icon_size}/apps/telegram-desktop.png"
+      install -Dm644 "../../../Telegram/Resources/art/icon''${icon_size}.png" "$out/share/icons/hicolor/''${icon_size}x''${icon_size}/apps/telegram.png"
     done
   '';
 
@@ -124,6 +131,7 @@ mkDerivation rec {
     wrapProgram $out/bin/telegram-desktop \
       "''${gappsWrapperArgs[@]}" \
       --prefix QT_PLUGIN_PATH : "${qtbase}/${qtbase.qtPluginPrefix}" \
+      --prefix PATH : ${xdg_utils}/bin \
       --set XDG_RUNTIME_DIR "XDG-RUNTIME-DIR"
     sed -i $out/bin/telegram-desktop \
       -e "s,'XDG-RUNTIME-DIR',\"\''${XDG_RUNTIME_DIR:-/run/user/\$(id --user)}\","
@@ -133,7 +141,7 @@ mkDerivation rec {
     description = "Telegram Desktop messaging app "
       + (if stable then "(stable version)" else "(pre-release)");
     license = licenses.gpl3;
-    platforms = [ "x86_64-linux" "i686-linux" ];
+    platforms = platforms.linux;
     homepage = https://desktop.telegram.org/;
     maintainers = with maintainers; [ primeos abbradar garbas ];
   };

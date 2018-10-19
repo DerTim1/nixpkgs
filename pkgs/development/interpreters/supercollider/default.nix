@@ -9,12 +9,12 @@ in
 
 stdenv.mkDerivation rec {
   name = "supercollider-${version}";
-  version = "3.9.2";
+  version = "3.9.3";
 
 
   src = fetchurl {
     url = "https://github.com/supercollider/supercollider/releases/download/Version-${version}/SuperCollider-${version}-Source-linux.tar.bz2";
-    sha256 = "0d3cb6dw8jz7ijriqn3rlwin24gffczp69hl17pzxj1d5w57yj44";
+    sha256 = "1d8ixfl100jvlialxdizp8wqsl1mp5pi2bam25vp97bhjd59cfdr";
   };
 
   hardeningDisable = [ "stackprotector" ];
@@ -34,6 +34,6 @@ stdenv.mkDerivation rec {
     description = "Programming language for real time audio synthesis";
     homepage = http://supercollider.sourceforge.net/;
     license = stdenv.lib.licenses.gpl3Plus;
-    platforms = stdenv.lib.platforms.linux;
+    platforms = [ "x686-linux" "x86_64-linux" ];
   };
 }

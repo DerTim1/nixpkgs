@@ -8,7 +8,7 @@ in stdenv.mkDerivation rec {
   version = "3.24.6";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/gtksourceview/${gnome3.versionBranch version}/${name}.tar.xz";
+    url = "mirror://gnome/sources/gtksourceview/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
     sha256 = "7aa6bdfebcdc73a763dddeaa42f190c40835e6f8495bb9eb8f78587e2577c188";
   };
 
@@ -21,18 +21,16 @@ in stdenv.mkDerivation rec {
 
   outputs = [ "out" "dev" ];
 
-  nativeBuildInputs = [ pkgconfig intltool gettext perl gobjectIntrospection vala_0_40 ]
+  nativeBuildInputs = [ pkgconfig intltool perl gobjectIntrospection vala_0_40 ]
     ++ stdenv.lib.optionals doCheck checkInputs;
 
-  buildInputs = [ atk cairo glib pango libxml2 ];
+  buildInputs = [ atk cairo glib pango libxml2 gettext ];
 
   preBuild = ''
     substituteInPlace gtksourceview/gtksourceview-utils.c --replace "@NIX_SHARE_PATH@" "$out/share"
   '';
 
   patches = [ ./3.x-nix_share_path.patch ];
-
-  NIX_LDFLAGS = stdenv.lib.optionalString stdenv.isDarwin "-lintl";
 
   enableParallelBuilding = true;
 

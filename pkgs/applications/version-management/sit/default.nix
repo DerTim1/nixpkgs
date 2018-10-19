@@ -1,23 +1,32 @@
-{ stdenv, fetchFromGitHub, rustPlatform }:
+{ stdenv, fetchFromGitHub, rustPlatform, cmake, libzip, gnupg, 
+  # Darwin
+  libiconv, CoreFoundation, Security }:
 
 rustPlatform.buildRustPackage rec {
   name = "sit-${version}";
-  version = "0.2.1";
+  version = "0.4.0";
 
   src = fetchFromGitHub {
-    owner = "sit-it";
+    owner = "sit-fyi";
     repo = "sit";
     rev = "v${version}";
-    sha256 = "1gcw5fqaqpxl2xgry0w8750g2msrk884zj1slym6r3nj7s2m9j22";
+    sha256 = "10ycs6vc7mfzxnxrki09xn974pcwh196h1pfnsds98x6r87hxkpn";
   };
 
-  cargoSha256 = "0hb82j97m8vw8m6gpb6s3bbi31xxv9nqh3aq7hkbmp1pqc02sg3q";
+  buildInputs = [ cmake libzip gnupg ] ++
+    (if stdenv.isDarwin then [ libiconv CoreFoundation Security ] else []);
+
+  preCheck = ''
+    export HOME=$(mktemp -d)
+  '';
+
+  cargoSha256 = "023anmnprxbsvqww1b1bdyfhbhjh1ah2kc67cdihvdvi4lqdmbia";
 
   meta = with stdenv.lib; {
-    description = "SCM-agnostic, file-based, offline-first, immutable issue tracker";
-    homepage = http://sit-it.org/;
+    description = "Serverless Information Tracker";
+    homepage = https://sit.fyi/;
     license = with licenses; [ asl20 /* or */ mit ];
-    maintainers = with maintainers; [ dywedir ];
+    maintainers = with maintainers; [ dywedir yrashk ];
     platforms = platforms.all;
   };
 }

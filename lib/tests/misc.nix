@@ -45,6 +45,21 @@ runTests {
     expected = true;
   };
 
+  testBitAnd = {
+    expr = (bitAnd 3 10);
+    expected = 2;
+  };
+
+  testBitOr = {
+    expr = (bitOr 3 10);
+    expected = 11;
+  };
+
+  testBitXor = {
+    expr = (bitXor 3 10);
+    expected = 9;
+  };
+
 # STRINGS
 
   testConcatMapStrings = {
@@ -97,7 +112,7 @@ runTests {
         storePathAppendix = isStorePath
           "${goodPath}/bin/python";
         nonAbsolute = isStorePath (concatStrings (tail (stringToCharacters goodPath)));
-        asPath = isStorePath (builtins.toPath goodPath);
+        asPath = isStorePath goodPath;
         otherPath = isStorePath "/something/else";
         otherVals = {
           attrset = isStorePath {};
@@ -197,6 +212,44 @@ runTests {
     expected = false;
   };
 
+
+# ATTRSETS
+
+  # code from the example
+  testRecursiveUpdateUntil = {
+    expr = recursiveUpdateUntil (path: l: r: path == ["foo"]) {
+      # first attribute set
+      foo.bar = 1;
+      foo.baz = 2;
+      bar = 3;
+    } {
+      #second attribute set
+      foo.bar = 1;
+      foo.quz = 2;
+      baz = 4;
+    };
+    expected = {
+      foo.bar = 1; # 'foo.*' from the second set
+      foo.quz = 2; #
+      bar = 3;     # 'bar' from the first set
+      baz = 4;     # 'baz' from the second set
+    };
+  };
+
+  testOverrideExistingEmpty = {
+    expr = overrideExisting {} { a = 1; };
+    expected = {};
+  };
+
+  testOverrideExistingDisjoint = {
+    expr = overrideExisting { b = 2; } { a = 1; };
+    expected = { b = 2; };
+  };
+
+  testOverrideExistingOverride = {
+    expr = overrideExisting { a = 3; b = 2; } { a = 1; };
+    expected = { a = 1; b = 2; };
+  };
 
 # GENERATORS
 # these tests assume attributes are converted to lists
@@ -316,8 +369,10 @@ runTests {
   testToPretty = {
     expr = mapAttrs (const (generators.toPretty {})) rec {
       int = 42;
+      float = 0.1337;
       bool = true;
-      string = "fnord";
+      string = ''fno"rd'';
+      path = /. + "/foo";
       null_ = null;
       function = x: x;
       functionArgs = { arg ? 4, foo }: arg;
@@ -327,14 +382,16 @@ runTests {
     };
     expected = rec {
       int = "42";
+      float = "~0.133700";
       bool = "true";
-      string = "\"fnord\"";
+      string = ''"fno\"rd"'';
+      path = "/foo";
       null_ = "null";
       function = "<λ>";
       functionArgs = "<λ:{(arg),foo}>";
       list = "[ 3 4 ${function} [ false ] ]";
       attrs = "{ \"foo\" = null; \"foo bar\" = \"baz\"; }";
-      drv = "<δ>";
+      drv = "<δ:test>";
     };
   };
 
@@ -362,10 +419,6 @@ runTests {
                 in (y.merge) { a = 10; };
 
           resRem7 = res6.replace (a: removeAttrs a ["a"]);
-
-          resReplace6 = let x = defaultOverridableDelayableArgs id { a = 7; mergeAttrBy = { a = builtins.add; }; };
-                            x2 = x.merge { a = 20; }; # now we have 27
-                        in (x2.replace) { a = 10; }; # and override the value by 10
 
           # fixed tests (delayed args): (when using them add some comments, please)
           resFixed1 =

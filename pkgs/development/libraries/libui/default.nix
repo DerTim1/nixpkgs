@@ -15,7 +15,9 @@ in
 
   nativeBuildInputs = [ pkgconfig ];
     buildInputs = [ cmake ] ++
-      (if stdenv.isDarwin then [darwin.apple_sdk.frameworks.Cocoa] else [gtk3]);
+      (if backend == "darwin" then [darwin.apple_sdk.frameworks.Cocoa]
+       else if backend == "unix" then [gtk3]
+       else null);
 
     preConfigure = stdenv.lib.optionalString stdenv.isDarwin ''
       sed -i 's/set(CMAKE_OSX_DEPLOYMENT_TARGET "10.8")//' ./CMakeLists.txt
@@ -47,9 +49,10 @@ in
       install_name_tool -id $out/lib/${shortName}.A.dylib $out/lib/${shortName}.A.dylib
     '';
 
-    meta = {
+    meta = with stdenv.lib; {
       homepage    = https://github.com/andlabs/libui;
       description = "Simple and portable (but not inflexible) GUI library in C that uses the native GUI technologies of each platform it supports.";
-      platforms   = stdenv.lib.platforms.unix;
+      license     = licenses.mit;
+      platforms   = platforms.unix;
     };
   }

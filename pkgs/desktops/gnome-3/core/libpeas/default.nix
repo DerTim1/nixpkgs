@@ -7,7 +7,7 @@ stdenv.mkDerivation rec {
   version = "1.22.0";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/libpeas/${gnome3.versionBranch version}/${name}.tar.xz";
+    url = "mirror://gnome/sources/libpeas/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
     sha256 = "0qm908kisyjzjxvygdl18hjqxvvgkq9w0phs2g55pck277sw0bsv";
   };
 
@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
     description = "A GObject-based plugins engine";
     homepage = http://ftp.acc.umu.se/pub/GNOME/sources/libpeas/;
     license = licenses.gpl2Plus;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
     maintainers = gnome3.maintainers;
   };
 }

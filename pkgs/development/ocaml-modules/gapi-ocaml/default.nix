@@ -1,4 +1,8 @@
-{ stdenv, fetchFromGitHub, ocaml, findlib, jbuilder, opam, ocurl, cryptokit, ocaml_extlib, yojson, ocamlnet, xmlm }:
+{ stdenv, fetchFromGitHub, ocaml, findlib, dune, ocurl, cryptokit, ocaml_extlib, yojson, ocamlnet, xmlm }:
+
+if !stdenv.lib.versionAtLeast ocaml.version "4.02"
+then throw "gapi-ocaml is not available for OCaml ${ocaml.version}"
+else
 
 stdenv.mkDerivation rec {
   name = "gapi-ocaml-${version}";
@@ -9,12 +13,10 @@ stdenv.mkDerivation rec {
     rev = "v${version}";
     sha256 = "0qgsy51bhkpfgl5rdnjw4bqs5fbh2w4vwrfbl8y3lh1wrqmnwci4";
   };
-  buildInputs = [ ocaml jbuilder findlib ];
+  buildInputs = [ ocaml dune findlib ];
   propagatedBuildInputs = [ ocurl cryptokit ocaml_extlib yojson ocamlnet xmlm ];
 
-  installPhase = "${opam}/bin/opam-installer -i --prefix=$out --libdir=$OCAMLFIND_DESTDIR";
-
-  createFindlibDestdir = true;
+  inherit (dune) installPhase;
 
   meta = {
     description = "OCaml client for google services";

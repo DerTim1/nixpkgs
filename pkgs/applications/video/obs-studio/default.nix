@@ -18,6 +18,7 @@
 , makeWrapper
 , pkgconfig
 , vlc
+, mbedtls
 
 , alsaSupport ? false
 , alsaLib
@@ -29,16 +30,14 @@ let
   optional = stdenv.lib.optional;
 in stdenv.mkDerivation rec {
   name = "obs-studio-${version}";
-  version = "21.1.1";
+  version = "22.0.3";
 
   src = fetchFromGitHub {
     owner = "jp9000";
     repo = "obs-studio";
     rev = "${version}";
-    sha256 = "11gr4szjypihp0562r23pvkmaln6vjz1z4y4ls34bmc8n9ixrdcv";
+    sha256 = "0ri9qkqk3h71b1a5bwpjzqdr21bbmfqbykg48l779d20zln23n1i";
   };
-
-  patches = [ ./find-xcb.patch ];
 
   nativeBuildInputs = [ cmake
                         pkgconfig
@@ -59,6 +58,7 @@ in stdenv.mkDerivation rec {
                   x264
                   vlc
                   makeWrapper
+                  mbedtls
                 ]
                 ++ optional alsaSupport alsaLib
                 ++ optional pulseaudioSupport libpulseaudio;

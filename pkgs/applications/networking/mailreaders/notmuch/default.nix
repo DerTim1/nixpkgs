@@ -12,7 +12,7 @@
 with stdenv.lib;
 
 stdenv.mkDerivation rec {
-  version = "0.26.1";
+  version = "0.28";
   name = "notmuch-${version}";
 
   passthru = {
@@ -21,8 +21,8 @@ stdenv.mkDerivation rec {
   };
 
   src = fetchurl {
-    url = "http://notmuchmail.org/releases/${name}.tar.gz";
-    sha256 = "0dx8nhdmkaqabxcgxfa757m99fi395y76h9ynx8539yh9m7y9xyk";
+    url = "https://notmuchmail.org/releases/${name}.tar.gz";
+    sha256 = "0dqarmjc8544m2w7bqrqmvsfy55fw82707z3lz9cql8nr777bjmc";
   };
 
   nativeBuildInputs = [ pkgconfig ];
@@ -32,7 +32,7 @@ stdenv.mkDerivation rec {
     doxygen perl  # (optional) api docs
     pythonPackages.sphinx pythonPackages.python  # (optional) documentation -> doc/INSTALL
     bash-completion  # (optional) dependency to install bash completion
-    emacs  # (optional) to byte compile emacs code
+    emacs  # (optional) to byte compile emacs code, also needed for tests
     ruby  # (optional) ruby bindings
     which dtach openssl bash  # test dependencies
   ]
@@ -55,6 +55,8 @@ stdenv.mkDerivation rec {
         --replace \"gpg\" \"${gnupg}/bin/gpg\"
     done
   '';
+
+  configureFlags = [ "--zshcompletiondir=$(out)/share/zsh/site-functions" ];
 
   # Notmuch doesn't use autoconf and consequently doesn't tag --bindir and
   # friends
@@ -89,6 +91,14 @@ stdenv.mkDerivation rec {
     install_name_tool -change "$badname" "$goodname" "$prg"
   '';
 
+  preCheck = let
+    test-database = fetchurl {
+      url = "https://notmuchmail.org/releases/test-databases/database-v1.tar.xz";
+      sha256 = "1lk91s00y4qy4pjh8638b5lfkgwyl282g1m27srsf7qfn58y16a2";
+    };
+  in ''
+    ln -s ${test-database} test/test-databases/database-v1.tar.xz
+  '';
   doCheck = !stdenv.isDarwin && (versionAtLeast gmime.version "3.0");
   checkTarget = "test V=1";
 

@@ -7,12 +7,12 @@
 stdenv.mkDerivation rec {
   name = "${pname}-${version}";
   pname = "calamares";
-  version = "3.1.12";
+  version = "3.2.2";
 
   # release including submodule
   src = fetchurl {
     url = "https://github.com/${pname}/${pname}/releases/download/v${version}/${name}.tar.gz";
-    sha256 = "0k59wnch2gmbsr5dh5swbjp4rkf5c1ml0n4sxf196wdasraismc6";
+    sha256 = "14hsv2m0jza33kf68l3rhqfjj7224fmvgvk1kg2qwhvplpjdn16v";
   };
 
   buildInputs = [

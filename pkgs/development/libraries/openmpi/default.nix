@@ -1,4 +1,5 @@
 { stdenv, fetchurl, gfortran, perl, libnl, rdma-core, zlib
+, numactl
 
 # Enable the Sun Grid Engine bindings
 , enableSGE ? false
@@ -8,15 +9,15 @@
 }:
 
 let
-  majorVersion = "3.0";
-  minorVersion = "0";
+  majorVersion = "3.1";
+  minorVersion = "2";
 
 in stdenv.mkDerivation rec {
   name = "openmpi-${majorVersion}.${minorVersion}";
 
   src = fetchurl {
     url = "http://www.open-mpi.org/software/ompi/v${majorVersion}/downloads/${name}.tar.bz2";
-    sha256 = "1mw2d94k6mp4scg1wnkj50vdh734fy5m2ygyrj65s4mh3prbz6gn";
+    sha256 = "1ibniapqki763agpfh65y284las083fqmj8m5b2pi8ilgy2fsm66";
   };
 
   postPatch = ''
@@ -24,7 +25,7 @@ in stdenv.mkDerivation rec {
   '';
 
   buildInputs = with stdenv; [ gfortran zlib ]
-    ++ lib.optional isLinux libnl
+    ++ lib.optionals isLinux [ libnl numactl ]
     ++ lib.optional (isLinux || isFreeBSD) rdma-core;
 
   nativeBuildInputs = [ perl ];

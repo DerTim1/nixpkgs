@@ -3,7 +3,6 @@
 
 # for update.nix
 , writeScript
-, runCommand
 , common-updater-scripts
 , bash
 , coreutils
@@ -15,16 +14,14 @@
 }:
 
 stdenv.mkDerivation rec {
-  name = "tor-0.3.2.10";
+  name = "tor-0.3.4.8";
 
   src = fetchurl {
     url = "https://dist.torproject.org/${name}.tar.gz";
-    sha256 = "1vnb2wkcmm8rnz0fqi3k7arl60mpycs8rjn8hvbgv56g3p1pgpv0";
+    sha256 = "08qhzcmzxp5xr2l5721vagksqnnbrzzzy5hmz5y9r8lrq2r4qsl2";
   };
 
   outputs = [ "out" "geoip" ];
-
-  enableParallelBuilding = true;
 
   nativeBuildInputs = [ pkgconfig ];
   buildInputs = [ libevent openssl zlib ] ++
@@ -38,19 +35,21 @@ stdenv.mkDerivation rec {
       --replace 'exec torsocks' 'exec ${torsocks}/bin/torsocks'
   '';
 
+  enableParallelBuilding = true;
+  enableParallelChecking = false; # 4 tests fail randomly
+
+  doCheck = true;
+
   postInstall = ''
     mkdir -p $geoip/share/tor
     mv $out/share/tor/geoip{,6} $geoip/share/tor
     rm -rf $out/share/tor
   '';
 
-  doCheck = true;
-
   passthru.updateScript = import ./update.nix {
     inherit (stdenv) lib;
     inherit
       writeScript
-      runCommand
       common-updater-scripts
       bash
       coreutils

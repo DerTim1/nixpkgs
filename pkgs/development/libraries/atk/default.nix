@@ -1,5 +1,5 @@
 { stdenv, fetchurl, meson, ninja, gettext, pkgconfig, glib
-, fixDarwinDylibNames, libintlOrEmpty, gobjectIntrospection, gnome3
+, fixDarwinDylibNames, gobjectIntrospection, gnome3
 }:
 
 let
@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
   name = "${pname}-${version}";
 
   src = fetchurl {
-    url = "mirror://gnome/sources/${pname}/${gnome3.versionBranch version}/${name}.tar.xz";
+    url = "mirror://gnome/sources/${pname}/${stdenv.lib.versions.majorMinor version}/${name}.tar.xz";
     sha256 = "1z7laf6qwv5zsqcnj222dm5f43c6f3liil0cgx4s4s62xjk1wfnd";
   };
 
@@ -25,8 +25,7 @@ stdenv.mkDerivation rec {
 
   outputs = [ "out" "dev" ];
 
-  buildInputs = libintlOrEmpty
-    ++ stdenv.lib.optional stdenv.isDarwin fixDarwinDylibNames;
+  buildInputs = stdenv.lib.optional stdenv.isDarwin fixDarwinDylibNames;
 
   nativeBuildInputs = [ meson ninja pkgconfig gettext gobjectIntrospection ];
 
@@ -34,8 +33,6 @@ stdenv.mkDerivation rec {
     # Required by atk.pc
     glib
   ];
-
-  NIX_LDFLAGS = if stdenv.isDarwin then "-lintl" else null;
 
   doCheck = true;
 

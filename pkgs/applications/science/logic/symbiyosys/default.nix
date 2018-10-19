@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation rec {
   name = "symbiyosys-${version}";
-  version = "2018.03.21";
+  version = "2018.09.12";
 
   src = fetchFromGitHub {
     owner  = "yosyshq";
     repo   = "symbiyosys";
-    rev    = "76a624a363bc44df102359595d34f29370c6668b";
-    sha256 = "1ikax1yiqgj5442wcgp1iigw8wiyw7k848z4ykn7k068kbc320bm";
+    rev    = "e90bcb588e97118af0cdba23fae562fb0efbf294";
+    sha256 = "16nlimpdc3g6lghwqpyirgrr1d9mgk4wg3c06fvglzaicvjixnfr";
   };
 
   buildInputs = [ python3 yosys ];
@@ -32,6 +32,6 @@ stdenv.mkDerivation rec {
     homepage    = https://symbiyosys.readthedocs.io/;
     license     = stdenv.lib.licenses.mit;
     maintainers = with stdenv.lib.maintainers; [ thoughtpolice ];
-    platforms   = stdenv.lib.platforms.linux;
+    platforms   = stdenv.lib.platforms.unix;
   };
 }

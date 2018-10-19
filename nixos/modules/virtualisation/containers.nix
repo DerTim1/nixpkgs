@@ -112,7 +112,7 @@ let
 
       # If the host is 64-bit and the container is 32-bit, add a
       # --personality flag.
-      ${optionalString (config.nixpkgs.system == "x86_64-linux") ''
+      ${optionalString (config.nixpkgs.localSystem.system == "x86_64-linux") ''
         if [ "$(< ''${SYSTEM_PATH:-/nix/var/nix/profiles/per-container/$INSTANCE/system}/system)" = i686-linux ]; then
           extraFlags+=" --personality=x86"
         fi
@@ -130,6 +130,7 @@ let
         --bind-ro=/nix/var/nix/daemon-socket \
         --bind="/nix/var/nix/profiles/per-container/$INSTANCE:/nix/var/nix/profiles" \
         --bind="/nix/var/nix/gcroots/per-container/$INSTANCE:/nix/var/nix/gcroots" \
+        --link-journal=try-guest \
         --setenv PRIVATE_NETWORK="$PRIVATE_NETWORK" \
         --setenv HOST_BRIDGE="$HOST_BRIDGE" \
         --setenv HOST_ADDRESS="$HOST_ADDRESS" \
@@ -255,9 +256,9 @@ let
   };
 
 
-  system = config.nixpkgs.system;
+  system = config.nixpkgs.localSystem.system;
 
-  bindMountOpts = { name, config, ... }: {
+  bindMountOpts = { name, ... }: {
 
     options = {
       mountPoint = mkOption {
@@ -284,7 +285,7 @@ let
 
   };
 
-  allowedDeviceOpts = { name, config, ... }: {
+  allowedDeviceOpts = { ... }: {
     options = {
       node = mkOption {
         example = "/dev/net/tun";
@@ -575,6 +576,16 @@ in
               '';
             };
 
+            extraFlags = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = [ "--drop-capability=CAP_SYS_CHROOT" ];
+              description = ''
+                Extra flags passed to the systemd-nspawn command.
+                See systemd-nspawn(1) for details.
+              '';
+            };
+
           } // networkOptions;
 
           config = mkMerge
@@ -596,7 +607,7 @@ in
                   { config, pkgs, ... }:
                   { services.postgresql.enable = true;
                     services.postgresql.package = pkgs.postgresql96;
-                    
+
                     system.stateVersion = "17.03";
                   };
               };
@@ -714,7 +725,9 @@ in
             ${optionalString cfg.autoStart ''
               AUTO_START=1
             ''}
-            EXTRA_NSPAWN_FLAGS="${mkBindFlags cfg.bindMounts}"
+            EXTRA_NSPAWN_FLAGS="${mkBindFlags cfg.bindMounts +
+              optionalString (cfg.extraFlags != [])
+                (" " + concatStringsSep " " cfg.extraFlags)}"
           '';
       }) config.containers;
 

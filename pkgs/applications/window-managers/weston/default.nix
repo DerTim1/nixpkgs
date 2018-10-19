@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, pkgconfig, wayland, libGLU_combined, libxkbcommon, cairo, libxcb
+{ stdenv, fetchurl, pkgconfig, wayland, libGL, mesa_noglu, libxkbcommon, cairo, libxcb
 , libXcursor, xlibsWrapper, udev, libdrm, mtdev, libjpeg, pam, dbus, libinput
 , pango ? null, libunwind ? null, freerdp ? null, vaapi ? null, libva ? null
 , libwebp ? null, xwayland ? null, wayland-protocols
@@ -7,16 +7,16 @@
 
 stdenv.mkDerivation rec {
   name = "weston-${version}";
-  version = "3.0.0";
+  version = "5.0.0";
 
   src = fetchurl {
-    url = "http://wayland.freedesktop.org/releases/${name}.tar.xz";
-    sha256 = "19936zlkb75xcaidd8fag4ah8000wrh2ziqy7nxkq36pimgdbqfd";
+    url = "https://wayland.freedesktop.org/releases/${name}.tar.xz";
+    sha256 = "1bsc9ry566mpk6fdwkqpvwq2j7m79d9cvh7d3lgf6igsphik98hm";
   };
 
   nativeBuildInputs = [ pkgconfig ];
   buildInputs = [
-    wayland libGLU_combined libxkbcommon cairo libxcb libXcursor xlibsWrapper udev libdrm
+    wayland libGL mesa_noglu libxkbcommon cairo libxcb libXcursor xlibsWrapper udev libdrm
     mtdev libjpeg pam dbus libinput pango libunwind freerdp vaapi libva
     libwebp wayland-protocols
   ];
@@ -40,7 +40,7 @@ stdenv.mkDerivation rec {
 
   meta = with stdenv.lib; {
     description = "Reference implementation of a Wayland compositor";
-    homepage = http://wayland.freedesktop.org/;
+    homepage = https://wayland.freedesktop.org/;
     license = licenses.mit;
     platforms = platforms.linux;
     maintainers = with maintainers; [ wkennington ];

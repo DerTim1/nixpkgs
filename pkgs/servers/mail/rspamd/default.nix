@@ -6,29 +6,25 @@ in
 
 stdenv.mkDerivation rec {
   name = "rspamd-${version}";
-  version = "1.6.6";
+  version = "1.8.0";
 
   src = fetchFromGitHub {
     owner = "vstakhov";
     repo = "rspamd";
     rev = version;
-    sha256 = "04jqrki7rlxywdig264kavy1h5882rspi2drkbdzrk35jjq8rh3h";
+    sha256 = "02q1id9kv5d6w1b1ifa2m6qrnbsja787dn0ywwi0yrsaqwk63wk7";
   };
 
   nativeBuildInputs = [ cmake pkgconfig perl ];
-  buildInputs = [ glib gmime libevent libmagic luajit openssl pcre sqlite ragel icu libfann];
+  buildInputs = [ glib gmime libevent libmagic luajit openssl pcre sqlite ragel icu libfann ];
 
-  postPatch = ''
-    substituteInPlace conf/common.conf --replace "\$CONFDIR/rspamd.conf.local" "/etc/rspamd/rspamd.conf.local"
-    substituteInPlace conf/common.conf --replace "\$CONFDIR/rspamd.conf.local.override" "/etc/rspamd/rspamd.conf.local.override"
-  '';
-
-  cmakeFlags = ''
-    -DDEBIAN_BUILD=ON
-    -DRUNDIR=/var/run/rspamd
-    -DDBDIR=/var/lib/rspamd
-    -DLOGDIR=/var/log/rspamd
-  '';
+  cmakeFlags = [
+    "-DDEBIAN_BUILD=ON"
+    "-DRUNDIR=/var/run/rspamd"
+    "-DDBDIR=/var/lib/rspamd"
+    "-DLOGDIR=/var/log/rspamd"
+    "-DLOCAL_CONFDIR=/etc/rspamd"
+  ];
 
   meta = with stdenv.lib; {
     homepage = https://github.com/vstakhov/rspamd;

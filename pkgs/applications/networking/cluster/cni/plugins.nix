@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation rec {
   name = "cni-plugins-${version}";
-  version = "0.7.0";
+  version = "0.7.3";
 
   src = fetchFromGitHub {
     owner = "containernetworking";
     repo = "plugins";
     rev = "v${version}";
-    sha256 = "0m885v76azs7lrk6m6n53rwh0xadwvdcr90h0l3bxpdv87sj2mnf";
+    sha256 = "1saaszzxy4x3jkqd9ac6cphmzfim7x84h28c9i7az46px40blzm1";
   };
 
   buildInputs = [ go ];

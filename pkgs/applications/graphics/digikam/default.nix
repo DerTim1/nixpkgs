@@ -1,4 +1,4 @@
-{ mkDerivation, lib, fetchFromGitHub, cmake, doxygen, extra-cmake-modules, wrapGAppsHook, fetchpatch
+{ mkDerivation, lib, fetchFromGitHub, cmake, doxygen, extra-cmake-modules, wrapGAppsHook
 
 # For `digitaglinktree`
 , perl, sqlite
@@ -34,8 +34,8 @@
 , libqtav
 , libusb1
 , marble
-, libGLU_combined
-, mysql
+, libGL
+, libGLU
 , opencv3
 , pcre
 , threadweaver
@@ -76,7 +76,8 @@ mkDerivation rec {
     liblqr1
     libqtav
     libusb1
-    libGLU_combined
+    libGL
+    libGLU
     opencv3
     pcre
 
@@ -116,7 +117,7 @@ mkDerivation rec {
   meta = with lib; {
     description = "Photo Management Program";
     license = licenses.gpl2;
-    homepage = http://www.digikam.org;
+    homepage = https://www.digikam.org;
     maintainers = with maintainers; [ the-kenny ];
     platforms = platforms.linux;
   };

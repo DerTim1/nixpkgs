@@ -6,11 +6,11 @@
 with stdenv.lib; 
 stdenv.mkDerivation rec {
   name = "eccodes-${version}";
-  version = "2.7.0";
+  version = "2.9.0";
 
   src = fetchurl {
-    url = "https://software.ecmwf.int/wiki/download/attachments/45757960/eccodes-${version}-Source.tar.gz";
-    sha256 = "0slfim64wdyd97nwv7ry0xwhiarphl93ij2v19c8a1c0dz7ld3qi";
+    url = "https://confluence.ecmwf.int/download/attachments/45757960/eccodes-${version}-Source.tar.gz";
+    sha256 = "1mh9zkfb5dj3j8fk3gdhz2bp6z13nik5pmynpf5l6qy3lhgyn17z";
   };
 
   nativeBuildInputs = [ cmake ];
@@ -43,7 +43,7 @@ stdenv.mkDerivation rec {
   '';
 
   meta = {
-    homepage = https://software.ecmwf.int/wiki/display/ECC/;
+    homepage = https://confluence.ecmwf.int/display/ECC/;
     license = licenses.asl20;
     maintainers = with maintainers; [ knedlsepp ];
     platforms = platforms.unix;

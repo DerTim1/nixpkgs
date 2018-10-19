@@ -1,9 +1,9 @@
-{ stdenv, fetchFromGitHub, cmake, pkgconfig
-, ethtool, nettools, libnl, libudev, python, perl
+{ stdenv, fetchFromGitHub, cmake, pkgconfig, pandoc
+, ethtool, nettools, libnl, udev, python, perl
 } :
 
 let
-  version = "17.1";
+  version = "20";
 
 in stdenv.mkDerivation {
   name = "rdma-core-${version}";
@@ -12,11 +12,11 @@ in stdenv.mkDerivation {
     owner = "linux-rdma";
     repo = "rdma-core";
     rev = "v${version}";
-    sha256 = "019h5q0szjccdgfk13qy0f2dxd0n1fr407b3qqq1vcmx41w9b6vz";
+    sha256 = "1zz9r1zq9ql806sbyi7nrslx1d96hgd9zvdlzbv4j31m6kfmsyri";
   };
 
-  nativeBuildInputs = [ cmake pkgconfig ];
-  buildInputs = [ libnl ethtool nettools libudev python perl ];
+  nativeBuildInputs = [ cmake pkgconfig pandoc ];
+  buildInputs = [ libnl ethtool nettools udev python perl ];
 
   cmakeFlags = [
     "-DCMAKE_INSTALL_RUNDIR=/run"
@@ -37,4 +37,3 @@ in stdenv.mkDerivation {
     maintainers = with maintainers; [ markuskowa ];
   };
 }
-

@@ -1,7 +1,7 @@
-{ stdenv, buildPackages, fetchurl, gettext
-, hostPlatform, genPosixLockObjOnly ? false
+{ stdenv, lib, fetchpatch, buildPackages, fetchurl, gettext
+, genPosixLockObjOnly ? false
 }: let
-  genPosixLockObjOnlyAttrs = stdenv.lib.optionalAttrs genPosixLockObjOnly {
+  genPosixLockObjOnlyAttrs = lib.optionalAttrs genPosixLockObjOnly {
     buildPhase = ''
       cd src
       make gen-posix-lock-obj
@@ -17,18 +17,18 @@
   };
 in stdenv.mkDerivation (rec {
   name = "libgpg-error-${version}";
-  version = "1.27";
+  version = "1.32";
 
   src = fetchurl {
     url = "mirror://gnupg/libgpg-error/${name}.tar.bz2";
-    sha256 = "1li95ni122fzinzlmxbln63nmgij63irxfvi52ws4zfbzv3am4sg";
+    sha256 = "1jj08ns4sh1hmafqp1giskvdicdz18la516va26jycy27kkwaif3";
   };
-
-  patches = if hostPlatform.isRiscV then ./riscv.patch else null;
 
   postPatch = ''
     sed '/BUILD_TIMESTAMP=/s/=.*/=1970-01-01T00:01+0000/' -i ./configure
-  '' + stdenv.lib.optionalString stdenv.hostPlatform.isMusl ''
+  '' + lib.optionalString (stdenv.hostPlatform.isAarch32 && stdenv.buildPlatform != stdenv.hostPlatform) ''
+    ln -s lock-obj-pub.arm-unknown-linux-gnueabi.h src/syscfg/lock-obj-pub.linux-gnueabihf.h
+  '' + lib.optionalString stdenv.hostPlatform.isMusl ''
     ln -s lock-obj-pub.x86_64-pc-linux-musl.h src/syscfg/lock-obj-pub.linux-musl.h
   '';
 
@@ -41,7 +41,7 @@ in stdenv.mkDerivation (rec {
   nativeBuildInputs = [ gettext ];
 
   postConfigure =
-    stdenv.lib.optionalString stdenv.isSunOS
+    lib.optionalString stdenv.isSunOS
     # For some reason, /bin/sh on OpenIndiana leads to this at the end of the
     # `config.status' run:
     #   ./config.status[1401]: shift: (null): bad number

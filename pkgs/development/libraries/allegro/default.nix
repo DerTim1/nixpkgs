@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
   version="4.4.2";
 
   src = fetchurl {
-    url = "http://download.gna.org/allegro/allegro/${version}/${name}.tar.gz";
+    url = "https://github.com/liballeg/allegro5/releases/download/${version}/${name}.tar.gz";
     sha256 = "1p0ghkmpc4kwij1z9rzxfv7adnpy4ayi0ifahlns1bdzgmbyf88v";
   };
 
@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
 
   meta = with stdenv.lib; {
     description = "A game programming library";
-    homepage = http://liballeg.org/;
+    homepage = https://liballeg.org/;
     license = licenses.free; # giftware
     maintainers = [ maintainers.raskin ];
     platforms = platforms.linux;

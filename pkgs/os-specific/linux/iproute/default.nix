@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   name = "iproute2-${version}";
-  version = "4.18.0";
+  version = "4.19.0";
 
   src = fetchurl {
     url = "mirror://kernel/linux/utils/net/iproute2/${name}.tar.xz";
-    sha256 = "0ida5njr9nacg6ym3rjvl3cc9czw0hn4akhzbqf8f4zmjl6cgrm9";
+    sha256 = "114rlb3bvrf7q6yr03mn1rj6gl7mrg0psvm2dx0qb2kxyjhmrv6r";
   };
 
   preConfigure = ''
@@ -50,6 +50,6 @@ stdenv.mkDerivation rec {
     description = "A collection of utilities for controlling TCP/IP networking and traffic control in Linux";
     platforms = platforms.linux;
     license = licenses.gpl2;
-    maintainers = with maintainers; [ eelco wkennington fpletz ];
+    maintainers = with maintainers; [ eelco fpletz ];
   };
 }

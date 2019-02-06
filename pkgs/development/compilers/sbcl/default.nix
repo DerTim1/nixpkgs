@@ -5,16 +5,19 @@
   # Note that the created binaries still need `patchelf --set-interpreter ...`
   # to get rid of ${glibc} dependency.
 , purgeNixReferences ? false
+, texinfo
 }:
 
 stdenv.mkDerivation rec {
   name    = "sbcl-${version}";
-  version = "1.4.12";
+  version = "1.4.16";
 
   src = fetchurl {
     url    = "mirror://sourceforge/project/sbcl/sbcl/${version}/${name}-source.tar.bz2";
-    sha256 = "0maa4h5zdykq050hdqk5wd74dhl6k7br3qrhfd4f2387skk8ky7a";
+    sha256 = "1myg4wkxnbfn5nz38xy62r1jhjy07x3h0b04vg858n41chdsv4wd";
   };
+
+  buildInputs = [texinfo];
 
   patchPhase = ''
     echo '"${version}.nixos"' > version.lisp-expr
@@ -46,11 +49,6 @@ stdenv.mkDerivation rec {
       '/date defaulted-source/i(or (and (= 2208988801 (file-write-date defaulted-source-truename)) (= 2208988801 (file-write-date defaulted-fasl-truename)))'
 
     # Fix the tests
-    sed -e '/deftest pwent/inil' -i contrib/sb-posix/posix-tests.lisp
-    sed -e '/deftest grent/inil' -i contrib/sb-posix/posix-tests.lisp
-    sed -e '/deftest .*ent.non-existing/,+5d' -i contrib/sb-posix/posix-tests.lisp
-    sed -e '/deftest \(pw\|gr\)ent/,+3d' -i contrib/sb-posix/posix-tests.lisp
-
     sed -e '5,$d' -i contrib/sb-bsd-sockets/tests.lisp
     sed -e '5,$d' -i contrib/sb-simple-streams/*test*.lisp
 
@@ -70,7 +68,8 @@ stdenv.mkDerivation rec {
     else
       # Fix software version retrieval
       ''
-        sed -e "s@/bin/uname@$(command -v uname)@g" -i src/code/*-os.lisp
+        sed -e "s@/bin/uname@$(command -v uname)@g" -i src/code/*-os.lisp \
+          src/code/run-program.lisp
       ''
     );
 
@@ -83,6 +82,7 @@ stdenv.mkDerivation rec {
 
   buildPhase = ''
     sh make.sh --prefix=$out --xc-host="${sbclBootstrapHost}"
+    (cd doc/manual ; make info)
   '';
 
   installPhase = ''

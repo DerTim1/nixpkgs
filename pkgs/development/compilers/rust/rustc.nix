@@ -93,7 +93,7 @@ stdenv.mkDerivation {
     # https://github.com/rust-lang/rust/issues/39522
     echo removing gdb-version-sensitive tests...
     find src/test/debuginfo -type f -execdir grep -q ignore-gdb-version '{}' \; -print -delete
-    rm src/test/debuginfo/{borrowed-c-style-enum.rs,c-style-enum-in-composite.rs,generic-enum-with-different-disr-sizes.rs}
+    rm src/test/debuginfo/{borrowed-c-style-enum.rs,c-style-enum-in-composite.rs,gdb-pretty-struct-and-enums.rs,generic-enum-with-different-disr-sizes.rs}
 
     # Useful debugging parameter
     # export VERBOSE=1

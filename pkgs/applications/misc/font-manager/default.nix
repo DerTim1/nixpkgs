@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
     sqlite
     librsvg
     gnome3.gtk
-    gnome3.defaultIconTheme
+    gnome3.adwaita-icon-theme
   ];
 
   patches = [ ./correct-post-install.patch ];
@@ -47,10 +47,6 @@ stdenv.mkDerivation rec {
   postPatch = ''
     chmod +x meson_post_install.py
     patchShebangs meson_post_install.py
-  '';
-
-  postInstall = ''
-    rm $out/share/applications/mimeinfo.cache
   '';
 
   meta = {

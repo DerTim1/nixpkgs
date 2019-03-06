@@ -70,6 +70,7 @@ rec {
           else builtins.unsafeGetAttrPos "name" attrs)
     , separateDebugInfo ? false
     , outputs ? [ "out" ]
+    , __darwinAllowLocalNetworking ? false
     , __impureHostDeps ? []
     , __propagatedImpureHostDeps ? []
     , sandboxProfile ? ""
@@ -86,7 +87,7 @@ rec {
       doCheck' = doCheck && stdenv.hostPlatform == stdenv.buildPlatform;
       doInstallCheck' = doInstallCheck && stdenv.hostPlatform == stdenv.buildPlatform;
 
-      separateDebugInfo' = separateDebugInfo && stdenv.hostPlatform.isLinux;
+      separateDebugInfo' = separateDebugInfo && stdenv.hostPlatform.isLinux && !(stdenv.hostPlatform.useLLVM or false);
       outputs' = outputs ++ lib.optional separateDebugInfo' "debug";
 
       fixedOutputDrv = attrs ? outputHash;
@@ -123,14 +124,14 @@ rec {
           (map (drv: drv.__spliced.buildBuild or drv) depsBuildBuild)
           (map (drv: drv.nativeDrv or drv) nativeBuildInputs
              ++ lib.optional separateDebugInfo' ../../build-support/setup-hooks/separate-debug-info.sh
-             ++ lib.optional stdenv.hostPlatform.isWindows ../../build-support/setup-hooks/win-dll-link.sh)
+             ++ lib.optional stdenv.hostPlatform.isWindows ../../build-support/setup-hooks/win-dll-link.sh
+             ++ lib.optionals doCheck checkInputs
+             ++ lib.optionals doInstallCheck' installCheckInputs)
           (map (drv: drv.__spliced.buildTarget or drv) depsBuildTarget)
         ]
         [
           (map (drv: drv.__spliced.hostHost or drv) depsHostHost)
-          (map (drv: drv.crossDrv or drv) (buildInputs
-             ++ lib.optionals doCheck checkInputs
-             ++ lib.optionals doInstallCheck' installCheckInputs))
+          (map (drv: drv.crossDrv or drv) buildInputs)
         ]
         [
           (map (drv: drv.__spliced.targetTarget or drv) depsTargetTarget)
@@ -175,6 +176,7 @@ rec {
         (removeAttrs attrs
           ["meta" "passthru" "pos"
            "checkInputs" "installCheckInputs"
+           "__darwinAllowLocalNetworking"
            "__impureHostDeps" "__propagatedImpureHostDeps"
            "sandboxProfile" "propagatedSandboxProfile"])
         // (lib.optionalAttrs (!(attrs ? name) && attrs ? pname && attrs ? version)) {
@@ -245,6 +247,7 @@ rec {
         } // lib.optionalAttrs (hardeningDisable != [] || hardeningEnable != []) {
           NIX_HARDENING_ENABLE = enabledHardeningOptions;
         } // lib.optionalAttrs (stdenv.buildPlatform.isDarwin) {
+          inherit __darwinAllowLocalNetworking;
           # TODO: remove lib.unique once nix has a list canonicalization primitive
           __sandboxProfile =
           let profiles = [ stdenv.extraSandboxProfile ] ++ computedSandboxProfile ++ computedPropagatedSandboxProfile ++ [ propagatedSandboxProfile sandboxProfile ];

@@ -32,7 +32,7 @@ let
     cd ${pkgs.nextcloud}
     exec /run/wrappers/bin/sudo -u nextcloud \
       NEXTCLOUD_CONFIG_DIR="${cfg.home}/config" \
-      ${config.services.phpfpm.phpPackage}/bin/php \
+      ${phpPackage}/bin/php \
       -c ${pkgs.writeText "php.ini" phpOptionsStr}\
       occ $*
   '';
@@ -172,7 +172,7 @@ in {
           Database host.
 
           Note: for using Unix authentication with PostgreSQL, this should be
-          set to <literal>/tmp</literal>.
+          set to <literal>/run/postgresql</literal>.
         '';
       };
       dbport = mkOption {
@@ -254,6 +254,23 @@ in {
           Whether to load the Memcached module into PHP.
           You still need to enable Memcached in your config.php.
           See https://docs.nextcloud.com/server/14/admin_manual/configuration_server/caching_configuration.html
+        '';
+      };
+    };
+    autoUpdateApps = {
+      enable = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Run regular auto update of all apps installed from the nextcloud app store.
+        '';
+      };
+      startAt = mkOption {
+        type = with types; either str (listOf str);
+        default = "05:00:00";
+        example = "Sun 14:00:00";
+        description = ''
+          When to run the update. See `systemd.services.&lt;name&gt;.startAt`.
         '';
       };
     };
@@ -360,7 +377,12 @@ in {
           environment.NEXTCLOUD_CONFIG_DIR = "${cfg.home}/config";
           serviceConfig.Type = "oneshot";
           serviceConfig.User = "nextcloud";
-          serviceConfig.ExecStart = "${pkgs.php}/bin/php -f ${pkgs.nextcloud}/cron.php";
+          serviceConfig.ExecStart = "${phpPackage}/bin/php -f ${pkgs.nextcloud}/cron.php";
+        };
+        "nextcloud-update-plugins" = mkIf cfg.autoUpdateApps.enable {
+          serviceConfig.Type = "oneshot";
+          serviceConfig.ExecStart = "${occ}/bin/nextcloud-occ app:update --all";
+          startAt = cfg.autoUpdateApps.startAt;
         };
       };
 
@@ -427,19 +449,19 @@ in {
                 priority = 210;
                 extraConfig = "return 301 $scheme://$host/remote.php/dav;";
               };
-              "~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/" = {
+              "~ ^\\/(?:build|tests|config|lib|3rdparty|templates|data)\\/" = {
                 priority = 300;
                 extraConfig = "deny all;";
               };
-              "~ ^/(?:\\.|autotest|occ|issue|indie|db_|console)" = {
+              "~ ^\\/(?:\\.|autotest|occ|issue|indie|db_|console)" = {
                 priority = 300;
                 extraConfig = "deny all;";
               };
-              "~ ^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[12]|updater/.+|ocs-provider/.+)\\.php(?:$|/)" = {
+              "~ ^\\/(?:index|remote|public|cron|core/ajax\\/update|status|ocs\\/v[12]|updater\\/.+|ocs-provider\\/.+|ocm-provider\\/.+)\\.php(?:$|\\/)" = {
                 priority = 500;
                 extraConfig = ''
                   include ${config.services.nginx.package}/conf/fastcgi.conf;
-                  fastcgi_split_path_info ^(.+\.php)(/.*)$;
+                  fastcgi_split_path_info ^(.+\.php)(\\/.*)$;
                   fastcgi_param PATH_INFO $fastcgi_path_info;
                   fastcgi_param HTTPS ${if cfg.https then "on" else "off"};
                   fastcgi_param modHeadersAvailable true;
@@ -450,7 +472,7 @@ in {
                   fastcgi_read_timeout 120s;
                 '';
               };
-              "~ ^/(?:updater|ocs-provider|ocm-provider)(?:$|\/)".extraConfig = ''
+              "~ ^\\/(?:updater|ocs-provider|ocm-provider)(?:$|\\/)".extraConfig = ''
                 try_files $uri/ =404;
                 index index.php;
               '';

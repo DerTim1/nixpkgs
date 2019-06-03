@@ -11,6 +11,7 @@
 , libXdmcp
 , qtbase
 , qtx11extras
+, qtsvg
 , speex
 , libv4l
 , x264
@@ -36,21 +37,14 @@ let
   optional = stdenv.lib.optional;
 in stdenv.mkDerivation rec {
   name = "obs-studio-${version}";
-  version = "22.0.3";
+  version = "23.1.0";
 
   src = fetchFromGitHub {
     owner = "jp9000";
     repo = "obs-studio";
     rev = "${version}";
-    sha256 = "0ri9qkqk3h71b1a5bwpjzqdr21bbmfqbykg48l779d20zln23n1i";
+    sha256 = "1iavrkjp7vgg0blm4lmj4mc4hrfx8yjaiwx55wmc5ynw80v37ybc";
   };
-
-  patches = [
-    (fetchpatch {
-      url = "https://patch-diff.githubusercontent.com/raw/obsproject/obs-studio/pull/1557.diff";
-      sha256 = "162fnkxh2wyn6wrrm1kzv7c2mn96kx35vlmk2qwn1nqlifbpsfyq";
-    })
-  ];
 
   nativeBuildInputs = [ cmake
                         pkgconfig
@@ -67,6 +61,7 @@ in stdenv.mkDerivation rec {
                   libXdmcp
                   qtbase
                   qtx11extras
+                  qtsvg
                   speex
                   x264
                   vlc

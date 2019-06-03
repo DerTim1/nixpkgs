@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, which, autoconf, automake, flex, yacc
+{ stdenv, fetchurl, fetchpatch, which, autoconf, automake, flex, yacc
 , kernel, glibc, perl, libtool_2, kerberos }:
 
 with (import ./srcs.nix { inherit fetchurl; });
@@ -10,8 +10,6 @@ let
 in stdenv.mkDerivation rec {
   name = "openafs-${version}-${kernel.modDirVersion}";
   inherit version src;
-
-  patches = [ ./linux-4.20.patch ];
 
   nativeBuildInputs = [ autoconf automake flex libtool_2 perl which yacc ]
     ++ kernel.moduleBuildDependencies;

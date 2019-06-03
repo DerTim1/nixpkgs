@@ -55,4 +55,47 @@ with super;
       install -D completions/zsh/_busted $out/share/zsh/site-functions/_busted
     '';
   });
- }
+
+  luuid = super.luuid.override(oa: {
+    buildInputs = [ pkgs.libuuid ];
+    extraConfig = ''
+      variables = {
+        LIBUUID_INCDIR="${pkgs.lib.getDev pkgs.libuuid}/include";
+        LIBUUID_LIBDIR="${pkgs.lib.getLib pkgs.libuuid}/lib";
+      }
+    '';
+    meta = oa.meta // {
+      platforms = pkgs.lib.platforms.linux;
+    };
+  });
+
+  rapidjson = super.rapidjson.overrideAttrs(oa: {
+    preBuild = ''
+      sed -i '/set(CMAKE_CXX_FLAGS/d' CMakeLists.txt
+      sed -i '/set(CMAKE_C_FLAGS/d' CMakeLists.txt
+    '';
+  });
+
+  binaryheap = super.binaryheap.overrideAttrs(oa: {
+    meta = oa.meta // {
+      maintainers = with pkgs.lib.maintainers; oa.meta.maintainers ++ [ vcunat ];
+    };
+  });
+
+  http = super.http.overrideAttrs(oa: {
+    patches = oa.patches or [] ++ [
+      (pkgs.fetchpatch {
+        name = "invalid-state-progression.patch";
+        url = "https://github.com/daurnimator/lua-http/commit/cb7b59474a.diff";
+        sha256 = "1vmx039n3nqfx50faqhs3wgiw28ws416rhw6vh6srmh9i826dac7";
+      })
+    ];
+    /* TODO: separate docs derivation? (pandoc is heavy)
+    nativeBuildInputs = [ pandoc ];
+    makeFlags = [ "-C doc" "lua-http.html" "lua-http.3" ];
+    */
+    meta = oa.meta // {
+      maintainers = with pkgs.lib.maintainers; oa.meta.maintainers ++ [ vcunat ];
+    };
+  });
+}

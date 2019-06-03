@@ -94,6 +94,8 @@ self: super: builtins.intersectAttrs super {
   # Won't find it's header files without help.
   sfml-audio = appendConfigureFlag super.sfml-audio "--extra-include-dirs=${pkgs.openal}/include/AL";
 
+  cachix = enableSeparateBinOutput super.cachix;
+
   hzk = overrideCabal super.hzk (drv: {
     preConfigure = "sed -i -e /include-dirs/d hzk.cabal";
     configureFlags =  "--extra-include-dirs=${pkgs.zookeeper_mt}/include/zookeeper";
@@ -128,17 +130,18 @@ self: super: builtins.intersectAttrs super {
 
   # Prevents needing to add `security_tool` as a run-time dependency for
   # everything using x509-system to give access to the `security` executable.
-  x509-system = if pkgs.stdenv.hostPlatform.isDarwin && !pkgs.stdenv.cc.nativeLibc
-    then let inherit (pkgs.darwin) security_tool;
-      in pkgs.lib.overrideDerivation (addBuildDepend super.x509-system security_tool) (drv: {
-        # darwin.security_tool is broken in Mojave (#45042)
+  x509-system =
+    if pkgs.stdenv.hostPlatform.isDarwin && !pkgs.stdenv.cc.nativeLibc
+    then
+      # darwin.security_tool is broken in Mojave (#45042)
 
-        # We will use the system provided security for now.
-        # Beware this WILL break in sandboxes!
+      # We will use the system provided security for now.
+      # Beware this WILL break in sandboxes!
 
-        # TODO(matthewbauer): If someone really needs this to work in sandboxes,
-        # I think we can add a propagatedImpureHost dep here, but I’m hoping to
-        # get a proper fix available soonish.
+      # TODO(matthewbauer): If someone really needs this to work in sandboxes,
+      # I think we can add a propagatedImpureHost dep here, but I’m hoping to
+      # get a proper fix available soonish.
+      overrideCabal super.x509-system (drv: {
         postPatch = (drv.postPatch or "") + ''
           substituteInPlace System/X509/MacOS.hs --replace security /usr/bin/security
         '';
@@ -536,10 +539,7 @@ self: super: builtins.intersectAttrs super {
     let path = stdenv.lib.makeBinPath [ gcc ];
     in overrideCabal (addBuildTool super.futhark makeWrapper) (_drv: {
       postInstall = ''
-        wrapProgram $out/bin/futhark-c \
-          --prefix PATH : "${path}"
-
-        wrapProgram $out/bin/futhark-opencl \
+        wrapProgram $out/bin/futhark \
           --prefix PATH : "${path}" \
           --set NIX_CC_WRAPPER_x86_64_unknown_linux_gnu_TARGET_HOST 1 \
           --set NIX_CFLAGS_COMPILE "-I${opencl-headers}/include" \

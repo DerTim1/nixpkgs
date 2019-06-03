@@ -1,20 +1,30 @@
-{ lib, stdenv, fetchurl, fetchFromGitHub, fetchpatch, perl, curl, bzip2, sqlite, openssl ? null, xz
-, pkgconfig, boehmgc, perlPackages, libsodium, brotli, boost, editline
-, autoreconfHook, autoconf-archive, bison, flex, libxml2, libxslt, docbook5, docbook_xsl_ns
-, busybox-sandbox-shell
+{ lib, fetchurl, fetchFromGitHub, callPackage
 , storeDir ? "/nix/store"
 , stateDir ? "/nix/var"
 , confDir ? "/etc"
-, withLibseccomp ? lib.any (lib.meta.platformMatch stdenv.hostPlatform) libseccomp.meta.platforms, libseccomp
-, withAWS ? stdenv.isLinux || stdenv.isDarwin, aws-sdk-cpp
+, boehmgc
+, stdenv, llvmPackages_6
 }:
 
 let
 
-  sh = busybox-sandbox-shell;
+common =
+  { lib, stdenv, fetchurl, fetchpatch, perl, curl, bzip2, sqlite, openssl ? null, xz
+  , pkgconfig, boehmgc, perlPackages, libsodium, brotli, boost, editline
+  , autoreconfHook, autoconf-archive, bison, flex, libxml2, libxslt, docbook5, docbook_xsl_ns
+  , busybox-sandbox-shell
+  , storeDir
+  , stateDir
+  , confDir
+  , withLibseccomp ? lib.any (lib.meta.platformMatch stdenv.hostPlatform) libseccomp.meta.platforms, libseccomp
+  , withAWS ? stdenv.isLinux || stdenv.isDarwin, aws-sdk-cpp
 
-  common = { name, suffix ? "", src, includesPerl ? false, fromGit ? false }:
-    let nix = stdenv.mkDerivation rec {
+  , name, suffix ? "", src, includesPerl ? false, fromGit ? false
+
+  }:
+  let
+     sh = busybox-sandbox-shell;
+     nix = stdenv.mkDerivation rec {
       inherit name src;
       version = lib.getVersion name;
 
@@ -144,7 +154,7 @@ in rec {
 
   nix = nixStable;
 
-  nix1 = common rec {
+  nix1 = callPackage common rec {
     name = "nix-1.11.16";
     src = fetchurl {
       url = "http://nixos.org/releases/nix/${name}/${name}.tar.xz";
@@ -153,17 +163,23 @@ in rec {
 
     # Nix1 has the perl bindings by default, so no need to build the manually.
     includesPerl = true;
+
+    inherit storeDir stateDir confDir boehmgc;
   };
 
-  nixStable = common rec {
-    name = "nix-2.2";
+  nixStable = callPackage common (rec {
+    name = "nix-2.2.2";
     src = fetchurl {
       url = "http://nixos.org/releases/nix/${name}/${name}.tar.xz";
-      sha256 = "63238d00d290b8a93925891fc9164439d3941e2ccc569bf7f7ca32f53c3ec0c7";
+      sha256 = "f80a1b4f9837a8d33209f0b7769d5038335459ff4303eccf3e9217a9eca8594c";
     };
-  };
 
-  nixUnstable = lib.lowPrio (common rec {
+    inherit storeDir stateDir confDir boehmgc;
+  } // stdenv.lib.optionalAttrs stdenv.cc.isClang {
+    stdenv = llvmPackages_6.stdenv;
+  });
+
+  nixUnstable = lib.lowPrio (callPackage common rec {
     name = "nix-2.3${suffix}";
     suffix = "pre6631_e58a7144";
     src = fetchFromGitHub {
@@ -173,6 +189,8 @@ in rec {
       sha256 = "1hbjhnvjbh8bi8cjjgyrj4z1gw03ws12m2wi5azzj3rmhnh4c802";
     };
     fromGit = true;
+
+    inherit storeDir stateDir confDir boehmgc;
   });
 
 }

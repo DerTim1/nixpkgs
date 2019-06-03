@@ -1,4 +1,4 @@
-{ lib, python36 }:
+{ lib, python3 }:
 
 # Flexget have been a trouble maker in the past,
 # if you see flexget breaking when updating packages, don't worry.
@@ -6,7 +6,7 @@
 # -- Mic92
 
 let
-  python' = python36.override { inherit packageOverrides; };
+  python' = python3.override { inherit packageOverrides; };
 
   packageOverrides = self: super: {
     guessit = super.guessit.overridePythonAttrs (old: rec {
@@ -24,18 +24,20 @@ with python'.pkgs;
 
 buildPythonApplication rec {
   pname = "FlexGet";
-  version = "2.17.20";
+  version = "2.21.2";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "a09ef9482ed54f7e96eb8b4d08c59687c5c43a3341c9d2675383693e6c3681c3";
+    sha256 = "3c11fd7c4bb7e1e9203acd4d452ae51d34843e65066a18c7c72445d7db28122a";
   };
 
   postPatch = ''
-    # build for the correct python version
-    substituteInPlace setup.cfg --replace $'[bdist_wheel]\npython-tag = py27' ""
     # remove dependency constraints
     sed 's/==\([0-9]\.\?\)\+//' -i requirements.txt
+
+    # "zxcvbn-python" was renamed to "zxcvbn", and we don't have the former in
+    # nixpkgs. See: https://github.com/NixOS/nixpkgs/issues/62110
+    substituteInPlace requirements.txt --replace "zxcvbn-python" "zxcvbn"
   '';
 
   # ~400 failures
@@ -47,12 +49,13 @@ buildPythonApplication rec {
     beautifulsoup4 html5lib
     PyRSS2Gen pynzb rpyc jinja2
     requests dateutil jsonschema
-    pathpy guessit APScheduler
+    pathpy guessit rebulk APScheduler
     terminaltables colorclass
     cherrypy flask flask-restful
     flask-restplus flask-compress
     flask_login flask-cors
-    pyparsing zxcvbn-python future
+    pyparsing zxcvbn future
+    progressbar
     # Optional requirements
     deluge-client
     # Plugins

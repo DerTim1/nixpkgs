@@ -12,7 +12,7 @@ To update the list of packages from MELPA,
 
 */
 
-{ fetchurl, lib, stdenv, texinfo }:
+{ lib, stdenv, texinfo }:
 
 self:
 
@@ -50,4 +50,4 @@ self:
 
     elpaPackages = super // overrides;
 
-  in elpaPackages // { inherit elpaBuild elpaPackages; }
+  in elpaPackages // { inherit elpaBuild; }

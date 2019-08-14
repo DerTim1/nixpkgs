@@ -1,4 +1,4 @@
-{ lib, callPackage, stdenv, fetchurl, fetchFromGitHub, fetchpatch, python3, overrideCC, gccStdenv, gcc6 }:
+{ lib, callPackage, fetchurl, fetchFromGitHub, overrideCC, gccStdenv, gcc6 }:
 
 let
 
@@ -17,17 +17,15 @@ rec {
 
   firefox = common rec {
     pname = "firefox";
-    ffversion = "67.0";
+    ffversion = "68.0.1";
     src = fetchurl {
       url = "mirror://mozilla/firefox/releases/${ffversion}/source/firefox-${ffversion}.source.tar.xz";
-      sha512 = "0lwljfcbb1avnlafyrw5z08l3wxixfk6nv91blp6sc45mvsk89l77ckfyay7jy4v6c84q4a9h0wbh2mnx0r1xm3fhy9lshlm1n0s051";
+      sha512 = "20rqfa5sdaagryk00iywnbap0bmhq1c74pfbxi3pq1cs52qs5nhjqn3xm6910zwcn5nw08i9qd5jkg5blvqrjzw780nh8qbrwsm3d4n";
     };
 
     patches = [
       ./no-buildconfig-ffx65.patch
     ];
-
-    extraNativeBuildInputs = [ python3 ];
 
     meta = {
       description = "A web browser built from Firefox source tree";
@@ -72,10 +70,11 @@ rec {
 
   firefox-esr-60 = common rec {
     pname = "firefox-esr";
-    ffversion = "60.7.0esr";
+    ffversion = "60.8.0esr";
+
     src = fetchurl {
       url = "mirror://mozilla/firefox/releases/${ffversion}/source/firefox-${ffversion}.source.tar.xz";
-      sha512 = "1armp7nmzn864l42nasw0zqsp8y1zj4vhgbm99c49a435m44c8p66qrjxy6rn2haqsy76i9x5zf8ph2d014ap6g5yhidj7iymbjh5f2";
+      sha512 = "0332b6049b97e488e55a3b9540baad3bd159e297084e9a625b8492497c73f86eb3e144219dabc5e9f2c2e4a27630d83d243c919cd4f86b7f59f47133ed3afc54";
     };
 
     patches = [
@@ -93,6 +92,28 @@ rec {
     };
     updateScript = callPackage ./update.nix {
       attrPath = "firefox-esr-60-unwrapped";
+      versionSuffix = "esr";
+      versionKey = "ffversion";
+    };
+  };
+
+  firefox-esr-68 = common rec {
+    pname = "firefox-esr";
+    ffversion = "68.0.1esr";
+    src = fetchurl {
+      url = "mirror://mozilla/firefox/releases/${ffversion}/source/firefox-${ffversion}.source.tar.xz";
+      sha512 = "27ncapq18rdlrf0kp5r09spcqazi0g8nbzbfxijs9pi3cvlkayagi3fbbzzq5jkn0n3j580vadc6v1v3zibvdwb5s3c6bz559a7nra2";
+    };
+
+    patches = [
+      ./no-buildconfig-ffx65.patch
+    ];
+
+    meta = firefox.meta // {
+      description = "A web browser built from Firefox Extended Support Release source tree";
+    };
+    updateScript = callPackage ./update.nix {
+      attrPath = "firefox-esr-68-unwrapped";
       versionSuffix = "esr";
       versionKey = "ffversion";
     };
@@ -245,16 +266,16 @@ in rec {
   };
 
   tor-browser-8-5 = tbcommon rec {
-    ffversion = "60.7.0esr";
-    tbversion = "8.5.0";
+    ffversion = "60.8.0esr";
+    tbversion = "8.5.4";
 
     # FIXME: fetchFromGitHub is not ideal, unpacked source is >900Mb
     src = fetchFromGitHub {
       owner = "SLNOS";
       repo  = "tor-browser";
-      # branch "tor-browser-60.7.0esr-8.5-1-slnos"
-      rev   = "8c69066856962116205c5c7508a0991dfb8ccd11";
-      sha256 = "1dshn7g9y6233vdqidrkg886ad6qjnl13vz2382ymbx180r2j73k";
+      # branch "tor-browser-60.8.0esr-8.5-1-slnos"
+      rev   = "9ec7e4832a68ba3a77f5e8e21dc930a25757f55d";
+      sha256 = "10x9h2nm1p8cs0qnd8yjp7ly5raxagqyfjn4sj2y3i86ya5zygb9";
     };
 
     patches = [

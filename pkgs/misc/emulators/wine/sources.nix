@@ -13,9 +13,9 @@ let fetchurl = args@{url, sha256, ...}:
 in rec {
 
   stable = fetchurl rec {
-    version = "4.0";
+    version = "4.0.1";
     url = "https://dl.winehq.org/wine/source/4.0/wine-${version}.tar.xz";
-    sha256 = "0k8d90mgjzv8vjspmnxzr3i5mbccxnbr9hf03q1bpf5jjppcsdk7";
+    sha256 = "0j29df0px6dzin4j0cbxgza4msvf9spmwranv25krq1g9kq959nk";
 
     ## see http://wiki.winehq.org/Gecko
     gecko32 = fetchurl rec {
@@ -31,24 +31,24 @@ in rec {
 
     ## see http://wiki.winehq.org/Mono
     mono = fetchurl rec {
-      version = "4.8.3";
+      version = "4.9.0";
       url = "http://dl.winehq.org/wine/wine-mono/${version}/wine-mono-${version}.msi";
-      sha256 = "0xhavcjwwr21am3bxp2cxlvykwasw8y4g8p470j5fg7skc0izynn";
+      sha256 = "04y7w57cgay74227qci1bjbzwvclkawwljqvgd7a5yhhdz7cfblf";
     };
   };
 
   unstable = fetchurl rec {
     # NOTE: Don't forget to change the SHA256 for staging as well.
-    version = "4.8";
+    version = "4.12.1";
     url = "https://dl.winehq.org/wine/source/4.x/wine-${version}.tar.xz";
-    sha256 = "0dd1vw3bq47ypdpflgmmbi68pjw5z3wz26kfwvnkxqbp28fapfa8";
+    sha256 = "09yjfb2k14y11k19lm8dqmb8qwxyhh67d5q1gqv480y64mljvkx0";
     inherit (stable) mono gecko32 gecko64;
   };
 
   staging = fetchFromGitHub rec {
     # https://github.com/wine-staging/wine-staging/releases
     inherit (unstable) version;
-    sha256 = "0npm44zdys78qbqqyvjczqqjdgacpsfds3jxyy1y4yj2xjqzagsq";
+    sha256 = "1bvpvj6vcw2p6vcjm6mw5maarbs4lfw1ix3pj020w4n3kg4nmmc4";
     owner = "wine-staging";
     repo = "wine-staging";
     rev = "v${version}";
@@ -56,8 +56,8 @@ in rec {
 
   winetricks = fetchFromGitHub rec {
     # https://github.com/Winetricks/winetricks/releases
-    version = "20190310";
-    sha256 = "0mqzl7k9q7lfkmk8fk9dfzi2dm45h31mrid9265qh2d56nk28ali";
+    version = "20190615";
+    sha256 = "1bdvj363yjn7agqq1fxdfz31j1rrs2wc02v874jjx5sw1bfq5qsa";
     owner = "Winetricks";
     repo = "winetricks";
     rev = version;

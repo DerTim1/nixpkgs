@@ -1,4 +1,4 @@
-{ lib, stdenv, python3
+{ lib, stdenv, python3, openssl
 , enableSystemd ? stdenv.isLinux
 }:
 
@@ -23,11 +23,11 @@ let
 
 in buildPythonApplication rec {
   pname = "matrix-synapse";
-  version = "0.99.5.2";
+  version = "1.2.1";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "0c1kf9zq7cg9scwnvph4vwk449gypbprmdjzrzrg0wp1rcc8h3gn";
+    sha256 = "0pr17n52vdq490q6c282nqnn51j5k0lf7mzaazpxjy4q86pxdfy5";
   };
 
   patches = [
@@ -72,7 +72,7 @@ in buildPythonApplication rec {
     unpaddedbase64
   ] ++ lib.optional enableSystemd systemd;
 
-  checkInputs = [ mock parameterized ];
+  checkInputs = [ mock parameterized openssl ];
 
   checkPhase = ''
     PYTHONPATH=".:$PYTHONPATH" ${python3.interpreter} -m twisted.trial tests

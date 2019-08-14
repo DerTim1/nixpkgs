@@ -1,26 +1,24 @@
-{ buildGoModule
+{ buildGoPackage
 , fetchFromGitHub
 , lib
 }:
 
-buildGoModule rec {
+buildGoPackage rec {
   pname = "wtf";
-  version = "0.10.3";
+  version = "0.17.1";
 
   src = fetchFromGitHub {
     owner = "wtfutil";
     repo = pname;
     rev = "v${version}";
-    sha256 = "0ffpydxlc2c9rpr6rnlqk3ca8xc4hjl2107wzcxzx9id1hw8fb40";
+    sha256 = "1qiwl6z5rraspjqry8dwnx8fgl9vv70sn5kgvh8074vl651yjq8c";
   };
 
-  modSha256 = "0as736nnx7ci4w9gdp27g55g6dny9bh1fryz3g89gxm2sa2nlb9l";
-
-  buildFlagsArray = [ "-ldflags=" "-X main.version=${version}" ];
+  goPackagePath = "github.com/wtfutil/wtf";
 
   meta = with lib; {
     description = "The personal information dashboard for your terminal";
-    homepage = http://wtfutil.com/;
+    homepage = "https://wtfutil.com/";
     license = licenses.mpl20;
     maintainers = with maintainers; [ kalbasit ];
     platforms = platforms.linux ++ platforms.darwin;

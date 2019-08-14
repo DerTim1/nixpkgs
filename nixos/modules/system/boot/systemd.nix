@@ -186,6 +186,9 @@ let
       "sockets.target"
       "sound.target"
       "systemd-exit.service"
+      "systemd-tmpfiles-clean.service"
+      "systemd-tmpfiles-clean.timer"
+      "systemd-tmpfiles-setup.service"
       "timers.target"
     ];
 
@@ -517,7 +520,7 @@ in
     };
 
     systemd.globalEnvironment = mkOption {
-      type = with types; attrsOf (nullOr (either str (either path package)));
+      type = with types; attrsOf (nullOr (oneOf [ str path package ]));
       default = {};
       example = { TZ = "CET"; };
       description = ''
@@ -940,7 +943,6 @@ in
     # Don't bother with certain units in containers.
     systemd.services.systemd-remount-fs.unitConfig.ConditionVirtualization = "!container";
     systemd.services.systemd-random-seed.unitConfig.ConditionVirtualization = "!container";
-
   };
 
   # FIXME: Remove these eventually.
@@ -949,5 +951,4 @@ in
       (mkRenamedOptionModule [ "boot" "systemd" "targets" ] [ "systemd" "targets" ])
       (mkRenamedOptionModule [ "boot" "systemd" "services" ] [ "systemd" "services" ])
     ];
-
 }

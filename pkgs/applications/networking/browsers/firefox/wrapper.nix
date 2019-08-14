@@ -2,7 +2,7 @@
 
 ## various stuff that can be plugged in
 , flashplayer, hal-flash
-, MPlayerPlugin, ffmpeg, xorg, libpulseaudio, libcanberra-gtk2
+, MPlayerPlugin, ffmpeg, xorg, libpulseaudio, libcanberra-gtk2, libglvnd
 , jrePlugin, icedtea_web
 , bluejeans, djview4, adobe-reader
 , google_talk_plugin, fribid, gnome3/*.gnome-shell*/
@@ -28,12 +28,12 @@ let
     , extraPlugins ? []
     , extraNativeMessagingHosts ? []
     , gdkWayland ? false
+    , cfg ? config.${browserName} or {}
     }:
 
     assert gdkWayland -> (browser ? gtk3); # Can only use the wayland backend if gtk3 is being used
 
     let
-      cfg = config.${browserName} or {};
       enableAdobeFlash = cfg.enableAdobeFlash or false;
       ffmpegSupport = browser.ffmpegSupport or false;
       gssSupport = browser.gssSupport or false;
@@ -77,6 +77,7 @@ let
       libs =   lib.optional stdenv.isLinux udev
             ++ lib.optional ffmpegSupport ffmpeg
             ++ lib.optional gssSupport kerberos
+            ++ lib.optional gdkWayland libglvnd
             ++ lib.optionals (cfg.enableQuakeLive or false)
             (with xorg; [ stdenv.cc libX11 libXxf86dga libXxf86vm libXext libXt alsaLib zlib ])
             ++ lib.optional (enableAdobeFlash && (cfg.enableAdobeFlashDRM or false)) hal-flash

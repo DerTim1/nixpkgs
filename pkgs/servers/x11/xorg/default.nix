@@ -728,6 +728,19 @@ lib.makeScope newScope (self: with self; {
     meta.platforms = stdenv.lib.platforms.unix;
   }) {};
 
+  libXTrap = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto, libX11, libXext, libXt }: stdenv.mkDerivation {
+    name = "libXTrap-1.0.1";
+    builder = ./builder.sh;
+    src = fetchurl {
+      url = mirror://xorg/individual/lib/libXTrap-1.0.1.tar.bz2;
+      sha256 = "0bi5wxj6avim61yidh9fd3j4n8czxias5m8vss9vhxjnk1aksdwg";
+    };
+    hardeningDisable = [ "bindnow" "relro" ];
+    nativeBuildInputs = [ pkgconfig ];
+    buildInputs = [ xorgproto libX11 libXext libXt ];
+    meta.platforms = stdenv.lib.platforms.unix;
+  }) {};
+
   libXau = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto }: stdenv.mkDerivation {
     name = "libXau-1.0.9";
     builder = ./builder.sh;
@@ -1405,11 +1418,11 @@ lib.makeScope newScope (self: with self; {
   }) {};
 
   xcalc = callPackage ({ stdenv, pkgconfig, fetchurl, libX11, libXaw, xorgproto, libXt }: stdenv.mkDerivation {
-    name = "xcalc-1.0.7";
+    name = "xcalc-1.1.0";
     builder = ./builder.sh;
     src = fetchurl {
-      url = mirror://xorg/individual/app/xcalc-1.0.7.tar.bz2;
-      sha256 = "08bzaldi76vrj7350d7b04pq7qa1qhi81x8i806yv42zcp8p3lkh";
+      url = mirror://xorg/individual/app/xcalc-1.1.0.tar.bz2;
+      sha256 = "1sxmlcb0sb3h4z05kl5l0kxnhrc0h8c74p9m3zdc7bv58jaldmym";
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
@@ -1768,7 +1781,7 @@ lib.makeScope newScope (self: with self; {
     meta.platforms = stdenv.lib.platforms.unix;
   }) {};
 
-  xf86videoamdgpu = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto, mesa_noglu, libGL, libdrm, udev, xorgserver }: stdenv.mkDerivation {
+  xf86videoamdgpu = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto, mesa, libGL, libdrm, udev, xorgserver }: stdenv.mkDerivation {
     name = "xf86-video-amdgpu-19.0.1";
     builder = ./builder.sh;
     src = fetchurl {
@@ -1777,7 +1790,7 @@ lib.makeScope newScope (self: with self; {
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
-    buildInputs = [ xorgproto mesa_noglu libGL libdrm udev xorgserver ];
+    buildInputs = [ xorgproto mesa libGL libdrm udev xorgserver ];
     meta.platforms = stdenv.lib.platforms.unix;
   }) {};
 
@@ -1820,7 +1833,7 @@ lib.makeScope newScope (self: with self; {
     meta.platforms = stdenv.lib.platforms.unix;
   }) {};
 
-  xf86videoati = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto, mesa_noglu, libGL, libdrm, udev, libpciaccess, xorgserver }: stdenv.mkDerivation {
+  xf86videoati = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto, mesa, libGL, libdrm, udev, libpciaccess, xorgserver }: stdenv.mkDerivation {
     name = "xf86-video-ati-19.0.1";
     builder = ./builder.sh;
     src = fetchurl {
@@ -1829,7 +1842,7 @@ lib.makeScope newScope (self: with self; {
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
-    buildInputs = [ xorgproto mesa_noglu libGL libdrm udev libpciaccess xorgserver ];
+    buildInputs = [ xorgproto mesa libGL libdrm udev libpciaccess xorgserver ];
     meta.platforms = stdenv.lib.platforms.unix;
   }) {};
 
@@ -2510,11 +2523,11 @@ lib.makeScope newScope (self: with self; {
   }) {};
 
   xkeyboardconfig = callPackage ({ stdenv, pkgconfig, fetchurl, libX11, xorgproto }: stdenv.mkDerivation {
-    name = "xkeyboard-config-2.24";
+    name = "xkeyboard-config-2.27";
     builder = ./builder.sh;
     src = fetchurl {
-      url = mirror://xorg/individual/data/xkeyboard-config/xkeyboard-config-2.24.tar.bz2;
-      sha256 = "1my4786pd7iv5x392r9skj3qclmbd26nqzvh2fllwkkbyj08bcci";
+      url = mirror://xorg/individual/data/xkeyboard-config/xkeyboard-config-2.27.tar.bz2;
+      sha256 = "07wh443lhwv1j0q6xnxnji7f7ahh7xphxj90fv02cdd6zv4aw3b9";
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
@@ -2679,11 +2692,11 @@ lib.makeScope newScope (self: with self; {
   }) {};
 
   xorgserver = callPackage ({ stdenv, pkgconfig, fetchurl, xorgproto, openssl, libX11, libXau, libXaw, libxcb, xcbutil, xcbutilwm, xcbutilimage, xcbutilkeysyms, xcbutilrenderutil, libXdmcp, libXfixes, libxkbfile, libXmu, libXpm, libXrender, libXres, libXt }: stdenv.mkDerivation {
-    name = "xorg-server-1.20.4";
+    name = "xorg-server-1.20.5";
     builder = ./builder.sh;
     src = fetchurl {
-      url = mirror://xorg/individual/xserver/xorg-server-1.20.4.tar.bz2;
-      sha256 = "1vk6j7hmigfill9x8m7a6vvgb3s50ji2yf6yprbgqfz9xf9x83zy";
+      url = mirror://xorg/individual/xserver/xorg-server-1.20.5.tar.bz2;
+      sha256 = "17dc3g8cc55nbkx3np64dsz04n621dnzjmcc9wys0xbyyd1q47d8";
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
@@ -2834,7 +2847,7 @@ lib.makeScope newScope (self: with self; {
     meta.platforms = stdenv.lib.platforms.unix;
   }) {};
 
-  xtrap = callPackage ({ stdenv, pkgconfig, fetchurl, libX11, libXt }: stdenv.mkDerivation {
+  xtrap = callPackage ({ stdenv, pkgconfig, fetchurl, libX11, libXt, libXTrap }: stdenv.mkDerivation {
     name = "xtrap-1.0.3";
     builder = ./builder.sh;
     src = fetchurl {
@@ -2843,7 +2856,7 @@ lib.makeScope newScope (self: with self; {
     };
     hardeningDisable = [ "bindnow" "relro" ];
     nativeBuildInputs = [ pkgconfig ];
-    buildInputs = [ libX11 libXt ];
+    buildInputs = [ libX11 libXt libXTrap ];
     meta.platforms = stdenv.lib.platforms.unix;
   }) {};
 

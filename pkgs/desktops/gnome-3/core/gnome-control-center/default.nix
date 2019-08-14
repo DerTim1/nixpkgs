@@ -1,6 +1,6 @@
 { fetchurl, stdenv, substituteAll, meson, ninja, pkgconfig, gnome3, ibus, gettext, upower, wrapGAppsHook
 , libcanberra-gtk3, accountsservice, libpwquality, libpulseaudio
-, gdk_pixbuf, librsvg, libgudev, libsecret, gnome-color-manager
+, gdk-pixbuf, librsvg, libgudev, libsecret, gnome-color-manager
 , libxml2, polkit, libxslt, libgtop, libsoup, colord, colord-gtk
 , libkrb5, networkmanagerapplet, networkmanager, glibc
 , libwacom, samba, shared-mime-info, tzdata, libgnomekbd
@@ -13,11 +13,11 @@
 
 stdenv.mkDerivation rec {
   pname = "gnome-control-center";
-  version = "3.32.1";
+  version = "3.32.2";
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${stdenv.lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
-    sha256 = "0xpcmwgnn29syi2kfxc8233a5f3j8cij5wcn76xmsmwxvxz5r85l";
+    sha256 = "03np0mhfl9kkdw4cb711pda0cli9zgh2bq2gqn2zwbdi3qnhk9gs";
   };
 
   nativeBuildInputs = [
@@ -31,9 +31,10 @@ stdenv.mkDerivation rec {
     gnome-online-accounts libsoup colord libpulseaudio fontconfig colord-gtk
     accountsservice libkrb5 networkmanagerapplet libwacom samba
     grilo libpwquality vino libcanberra-gtk3 libgudev libsecret
-    gdk_pixbuf adwaita-icon-theme librsvg clutter clutter-gtk cheese
+    gdk-pixbuf adwaita-icon-theme librsvg clutter clutter-gtk cheese
     networkmanager modemmanager gnome-bluetooth tracker
     udisks2 gsound libhandy
+    mutter # schemas for the keybindings
   ];
 
   patches = [
@@ -59,7 +60,7 @@ stdenv.mkDerivation rec {
     gappsWrapperArgs+=(
       --prefix XDG_DATA_DIRS : "${sound-theme-freedesktop}/share"
       # Thumbnailers (for setting user profile pictures)
-      --prefix XDG_DATA_DIRS : "${gdk_pixbuf}/share"
+      --prefix XDG_DATA_DIRS : "${gdk-pixbuf}/share"
       --prefix XDG_DATA_DIRS : "${librsvg}/share"
       # WM keyboard shortcuts
       --prefix XDG_DATA_DIRS : "${mutter}/share"

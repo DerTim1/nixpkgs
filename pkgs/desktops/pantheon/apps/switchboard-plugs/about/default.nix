@@ -1,5 +1,17 @@
-{ stdenv, fetchFromGitHub, pantheon, substituteAll, meson, ninja, pkgconfig
-, vala, libgee, granite, gtk3, switchboard, pciutils, gobject-introspection }:
+{ stdenv
+, fetchFromGitHub
+, pantheon
+, substituteAll
+, meson
+, ninja
+, pkgconfig
+, vala
+, libgee
+, granite
+, gtk3
+, switchboard
+, pciutils
+}:
 
 stdenv.mkDerivation rec {
   pname = "switchboard-plug-about";
@@ -19,7 +31,6 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    gobject-introspection
     meson
     ninja
     pkgconfig

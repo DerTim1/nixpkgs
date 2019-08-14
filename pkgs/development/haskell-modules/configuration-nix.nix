@@ -279,9 +279,7 @@ self: super: builtins.intersectAttrs super {
       let dontCheckDarwin = if pkgs.stdenv.isDarwin
                             then dontCheck
                             else pkgs.lib.id;
-      in dontCheckDarwin (super.llvm-hs.override {
-        llvm-config = pkgs.llvm_6;
-      });
+      in dontCheckDarwin (super.llvm-hs.override { llvm-config = pkgs.llvm_8; });
 
   # Needs help finding LLVM.
   spaceprobe = addBuildTool super.spaceprobe self.llvmPackages.llvm;
@@ -491,7 +489,11 @@ self: super: builtins.intersectAttrs super {
   servant-streaming-server = dontCheck super.servant-streaming-server;
 
   # https://github.com/haskell-servant/servant/pull/1128
-  servant-client-core = appendPatch super.servant-client-core ./patches/servant-client-core-streamBody.patch;
+  servant-client-core = if (pkgs.lib.getVersion super.servant-client-core) == "0.15" then
+    appendPatch super.servant-client-core ./patches/servant-client-core-streamBody.patch
+  else
+    super.servant-client-core;
+
 
   # tests run executable, relying on PATH
   # without this, tests fail with "Couldn't launch intero process"
@@ -500,6 +502,12 @@ self: super: builtins.intersectAttrs super {
       export PATH="$PWD/dist/build/intero:$PATH"
     '';
   });
+
+  # Break infinite recursion cycle between QuickCheck and splitmix.
+  splitmix = dontCheck super.splitmix;
+
+  # Break infinite recursion cycle between tasty and clock.
+  clock = dontCheck super.clock;
 
   # loc and loc-test depend on each other for testing. Break that infinite cycle:
   loc-test = super.loc-test.override { loc = dontCheck self.loc; };
@@ -568,5 +576,19 @@ self: super: builtins.intersectAttrs super {
 
   # Avoid infitite recursion with tonatona.
   tonaparser = dontCheck super.tonaparser;
+
+  # Needs internet to run tests
+  HTTP = dontCheck super.HTTP;
+
+  # Break infinite recursions.
+  Dust-crypto = dontCheck super.Dust-crypto;
+  nanospec = dontCheck super.nanospec;
+  options = dontCheck super.options;
+  snap-server = dontCheck super.snap-server;
+
+  # Tests require internet
+  dhall_1_25_0 = dontCheck super.dhall_1_25_0;
+  http-download = dontCheck super.http-download;
+  pantry = dontCheck super.pantry;
 
 }

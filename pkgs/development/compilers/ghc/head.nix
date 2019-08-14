@@ -2,7 +2,8 @@
 
 # build-tools
 , bootPkgs
-, autoconf, automake, coreutils, fetchgit, fetchurl, fetchpatch, perl, python3, m4, sphinx
+, autoconf, automake, coreutils, fetchgit, fetchpatch, perl, python3, m4, sphinx
+, bash
 
 , libiconv ? null, ncurses
 
@@ -26,7 +27,7 @@
 , # Whetherto build terminfo.
   enableTerminfo ? !stdenv.targetPlatform.isWindows
 
-, version ? "8.7.20190115"
+, version ? "8.9.20190601"
 , # What flavour to build. An empty string indicates no
   # specific flavour and falls back to ghc default values.
   ghcFlavour ? stdenv.lib.optionalString (stdenv.targetPlatform != stdenv.hostPlatform)
@@ -88,13 +89,23 @@ stdenv.mkDerivation (rec {
 
   src = fetchgit {
     url = "https://gitlab.haskell.org/ghc/ghc.git/";
-    rev = "c9756dbf1ee58b117ea5c4ded45dea88030efd65";
-    sha256 = "0ja3ivyz4jrqkw6z1mdgsczxaqkjy5vw0nyyqlqr0bqxiw9p8834";
+    rev = "9bc10993bb300d3712b0f13ec6e28621d75d4204";
+    sha256 = "1s7vbinywx8ffj09nxr0h32nggjiqpssrvgmj7820k32w2yi7i8v";
   };
 
   enableParallelBuilding = true;
 
   outputs = [ "out" "doc" ];
+
+  patches = [
+    (fetchpatch rec { # https://github.com/haskell/haddock/issues/900
+     url = "https://patch-diff.githubusercontent.com/raw/haskell/haddock/pull/983.diff";
+     name = "loadpluginsinmodules.diff";
+     sha256 = "0bvvv0zsfq2581zsir97zfkggc1kkircbbajc2fz3b169ycpbha1";
+     extraPrefix = "utils/haddock/";
+     stripLen = 1;
+   })
+  ];
 
   postPatch = "patchShebangs .";
 
@@ -108,7 +119,8 @@ stdenv.mkDerivation (rec {
     export CC="${targetCC}/bin/${targetCC.targetPrefix}cc"
     export CXX="${targetCC}/bin/${targetCC.targetPrefix}cxx"
     # Use gold to work around https://sourceware.org/bugzilla/show_bug.cgi?id=16177
-    export LD="${targetCC.bintools}/bin/${targetCC.bintools.targetPrefix}ld${stdenv.lib.optionalString targetPlatform.isAarch32 ".gold"}"
+    # and more generally have a faster linker.
+    export LD="${targetCC.bintools}/bin/${targetCC.bintools.targetPrefix}ld${stdenv.lib.optionalString targetPlatform.isLinux ".gold"}"
     export AS="${targetCC.bintools.bintools}/bin/${targetCC.bintools.targetPrefix}as"
     export AR="${targetCC.bintools.bintools}/bin/${targetCC.bintools.targetPrefix}ar"
     export NM="${targetCC.bintools.bintools}/bin/${targetCC.bintools.targetPrefix}nm"
@@ -177,7 +189,7 @@ stdenv.mkDerivation (rec {
   # For building runtime libs
   depsBuildTarget = toolsForTarget;
 
-  buildInputs = [ perl ] ++ (libDeps hostPlatform);
+  buildInputs = [ perl bash ] ++ (libDeps hostPlatform);
 
   propagatedBuildInputs = [ targetPackages.stdenv.cc ]
     ++ stdenv.lib.optional useLLVM llvmPackages.llvm;

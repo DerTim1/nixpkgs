@@ -24,10 +24,10 @@ lib.makeScope pkgs.newScope (self: with self; {
   corePackages = with gnome3; [
     pkgs.desktop-file-utils
     pkgs.shared-mime-info # for update-mime-database
-    glib # for gsettings
-    gtk3.out # for gtk-update-icon-cache
+    pkgs.glib # for gsettings
+    pkgs.gtk3.out # for gtk-update-icon-cache
     glib-networking gvfs dconf gnome-backgrounds gnome-control-center
-    gnome-menus gnome-settings-daemon gnome-shell
+    pkgs.gnome-menus gnome-settings-daemon gnome-shell
     gnome-themes-extra adwaita-icon-theme gnome-shell-extensions
     pkgs.hicolor-icon-theme
   ];
@@ -41,7 +41,7 @@ lib.makeScope pkgs.newScope (self: with self; {
     nautilus-sendto dconf-editor vinagre gnome-weather gnome-logs
     gnome-maps gnome-characters gnome-calendar accerciser gnome-nettool
     gnome-getting-started-docs gnome-packagekit gnome-software
-    gnome-power-manager gnome-todo gnome-usage
+    gnome-power-manager gnome-todo pkgs.gnome-usage
   ];
 
   gamesPackages = with gnome3; [ swell-foop lightsoff iagno
@@ -345,9 +345,7 @@ lib.makeScope pkgs.newScope (self: with self; {
 
   nautilus-python = callPackage ./misc/nautilus-python { };
 
-  pidgin-im-gnome-shell-extension = callPackage ./misc/pidgin { };
-
-  gtkhtml = callPackage ./misc/gtkhtml { };
+  gtkhtml = callPackage ./misc/gtkhtml { enchant = pkgs.enchant1; };
 
   pomodoro = callPackage ./misc/pomodoro { };
 
@@ -398,4 +396,6 @@ lib.makeScope pkgs.newScope (self: with self; {
   gtk = gtk3;
   gtkmm = gtkmm3;
   rest = librest;
+
+  pidgin-im-gnome-shell-extension = pkgs.gnomeExtensions.pidgin-im-integration; # added 2019-08-01
 })

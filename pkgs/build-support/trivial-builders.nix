@@ -94,23 +94,32 @@ rec {
 
   /*
    * Writes a text file to nix store in a specific directory with no
-   * optional parameters available. Name passed is the destination.
+   * optional parameters available.
    *
    * Example:
-   * # Writes contents of file to /nix/store/<store path>/<name>
+   * # Writes contents of file to /nix/store/<store path>/share/my-file
    * writeTextDir "share/my-file"
    *   ''
    *   Contents of File
    *   '';
    *
   */
-  writeTextDir = name: text: writeTextFile {inherit name text; destination = "/${name}";};
+  writeTextDir = path: text: writeTextFile {
+    inherit text;
+    name = builtins.baseNameOf path;
+    destination = "/${path}";
+  };
 
   /*
-   * Writes a text file to /nix/store/<store path> and marks the file as executable.
+   * Writes a text file to /nix/store/<store path> and marks the file as
+   * executable.
+   *
+   * If passed as a build input, will be used as a setup hook. This makes setup
+   * hooks more efficient to create: you don't need a derivation that copies
+   * them to $out/nix-support/setup-hook, instead you can use the file as is.
    *
    * Example:
-   * # Writes my-file to /nix/store/<store path>/bin/my-file and makes executable
+   * # Writes my-file to /nix/store/<store path> and makes executable
    * writeScript "my-file"
    *   ''
    *   Contents of File
@@ -138,7 +147,7 @@ rec {
    * Automatically includes interpreter above the contents passed.
    *
    * Example:
-   * # Writes my-file to /nix/store/<store path>/my-file and makes executable.
+   * # Writes my-file to /nix/store/<store path> and makes executable.
    * writeShellScript "my-file"
    *   ''
    *   Contents of File

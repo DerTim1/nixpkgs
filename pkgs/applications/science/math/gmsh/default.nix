@@ -1,22 +1,22 @@
 { stdenv, fetchurl, cmake, openblasCompat, gfortran, gmm, fltk, libjpeg
 , zlib, libGLU_combined, libGLU, xorg }:
 
-let version = "4.2.3"; in
+let version = "4.4.1"; in
 
 stdenv.mkDerivation {
   name = "gmsh-${version}";
 
   src = fetchurl {
     url = "http://gmsh.info/src/gmsh-${version}-source.tgz";
-    sha256 = "0n18wmj8i4m1pzri3r0676lx1427zf8qmsrgnn07drv6if1cia2q";
+    sha256 = "1p7hibmsgv961lfkzdxlgcvmcb0q155m2sp60r97cjsfzhw68g45";
   };
 
-  buildInputs = [ cmake openblasCompat gmm fltk libjpeg zlib libGLU_combined
+  buildInputs = [ openblasCompat gmm fltk libjpeg zlib libGLU_combined
     libGLU xorg.libXrender xorg.libXcursor xorg.libXfixes xorg.libXext
     xorg.libXft xorg.libXinerama xorg.libX11 xorg.libSM xorg.libICE
   ];
 
-  nativeBuildInputs = [ gfortran ];
+  nativeBuildInputs = [ cmake gfortran ];
 
   enableParallelBuilding = true;
 

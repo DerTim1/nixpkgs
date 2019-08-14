@@ -48,7 +48,7 @@ in rec {
   };
 
   prometheus_2 = buildPrometheus {
-    version = "2.9.2";
-    sha256 = "1nbvw9ia15ls3l2pydc9hdfs057kjlg0cm8h4w9sjjnsssbikl26";
+    version = "2.11.1";
+    sha256 = "1d4kiv88v1p74cm1wg6wk1cs963xg2rlhkxw86slf9hmldlgww2l";
   };
 }

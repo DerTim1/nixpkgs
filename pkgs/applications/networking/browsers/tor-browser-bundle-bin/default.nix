@@ -12,7 +12,7 @@
 , dbus-glib
 , fontconfig
 , freetype
-, gdk_pixbuf
+, gdk-pixbuf
 , glib
 , gtk3
 , libxcb
@@ -67,7 +67,7 @@ let
     dbus-glib
     fontconfig
     freetype
-    gdk_pixbuf
+    gdk-pixbuf
     glib
     gtk3
     libxcb
@@ -89,7 +89,7 @@ let
   fteLibPath = makeLibraryPath [ stdenv.cc.cc gmp ];
 
   # Upstream source
-  version = "8.5";
+  version = "8.5.4";
 
   lang = "en-US";
 
@@ -99,7 +99,7 @@ let
         "https://github.com/TheTorProject/gettorbrowser/releases/download/v${version}/tor-browser-linux64-${version}_${lang}.tar.xz"
         "https://dist.torproject.org/torbrowser/${version}/tor-browser-linux64-${version}_${lang}.tar.xz"
       ];
-      sha256 = "09ixdq4n41cf5f3agmam3n669fflz6vwpalxpai07p2alal80g2x";
+      sha256 = "0nnzynk3nlnd847c8jjghs9anmr5a2hv7nk1qxigigxqa5vqy96z";
     };
 
     "i686-linux" = fetchurl {
@@ -107,7 +107,7 @@ let
         "https://dist.torproject.org/torbrowser/${version}/tor-browser-linux32-${version}_${lang}.tar.xz"
         "https://github.com/TheTorProject/gettorbrowser/releases/download/v${version}/tor-browser-linux32-${version}_${lang}.tar.xz"
       ];
-      sha256 = "0lgxwb8hll29sk7rpnraw9gfz7f9sb81gjsbxdnmm34y1vrabjv7";
+      sha256 = "1b34skl3hwvpy0r4l5ykgnnwhbz7cvly2gi9ib4h7lijjfafiys1";
     };
   };
 in

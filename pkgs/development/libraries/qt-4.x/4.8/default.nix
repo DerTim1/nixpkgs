@@ -1,11 +1,12 @@
 { stdenv, lib, fetchurl, fetchpatch, substituteAll
 , libXrender, libXinerama, libXcursor, libXv, libXext
 , libXfixes, libXrandr, libSM, freetype, fontconfig, zlib, libjpeg, libpng
-, libmng, which, libGLSupported, libGLU, openssl, dbus, cups, pkgconfig
+, libmng, which, libGLU, openssl, dbus, cups, pkgconfig
 , libtiff, glib, icu, mysql, postgresql, sqlite, perl, coreutils, libXi
 , buildMultimedia ? stdenv.isLinux, alsaLib, gstreamer, gst-plugins-base
 , buildWebkit ? (stdenv.isLinux || stdenv.isDarwin)
-, flashplayerFix ? false, gdk_pixbuf
+, libGLSupported ? stdenv.lib.elem stdenv.hostPlatform.system stdenv.lib.platforms.mesaPlatforms
+, flashplayerFix ? false, gdk-pixbuf
 , gtkStyle ? stdenv.hostPlatform == stdenv.buildPlatform, gtk2
 , gnomeStyle ? false, libgnomeui, GConf, gnome_vfs
 , developerBuild ? false
@@ -13,7 +14,7 @@
 , examples ? false
 , demos ? false
 # darwin support
-, cf-private, libobjc, ApplicationServices, OpenGL, Cocoa, AGL, libcxx
+, libobjc, ApplicationServices, OpenGL, Cocoa, AGL, libcxx
 }:
 
 let
@@ -187,8 +188,8 @@ stdenv.mkDerivation rec {
     [ cups # Qt dlopen's libcups instead of linking to it
       postgresql sqlite libjpeg libmng libtiff icu ]
     ++ lib.optionals (mysql != null) [ mysql.connector-c ]
-    ++ lib.optionals gtkStyle [ gtk2 gdk_pixbuf ]
-    ++ lib.optionals stdenv.isDarwin [ cf-private ApplicationServices OpenGL Cocoa AGL libcxx libobjc ];
+    ++ lib.optionals gtkStyle [ gtk2 gdk-pixbuf ]
+    ++ lib.optionals stdenv.isDarwin [ ApplicationServices OpenGL Cocoa AGL libcxx libobjc ];
 
   nativeBuildInputs = [ perl pkgconfig which ];
 

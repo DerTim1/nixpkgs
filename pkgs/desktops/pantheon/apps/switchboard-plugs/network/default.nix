@@ -1,5 +1,18 @@
-{ stdenv, fetchFromGitHub, pantheon, meson, ninja, pkgconfig, substituteAll, vala
-, libgee, granite, gtk3, networkmanager, networkmanagerapplet, switchboard, gobject-introspection }:
+{ stdenv
+, fetchFromGitHub
+, pantheon
+, meson
+, ninja
+, pkgconfig
+, substituteAll
+, vala
+, libgee
+, granite
+, gtk3
+, networkmanager
+, networkmanagerapplet
+, switchboard
+}:
 
 stdenv.mkDerivation rec {
   pname = "switchboard-plug-network";
@@ -19,7 +32,6 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    gobject-introspection
     meson
     ninja
     pkgconfig

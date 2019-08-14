@@ -1,15 +1,8 @@
-{ lib, python3, fetchpatch, platformio, esptool, git, protobuf3_7 }:
+{ lib, python3, platformio, esptool, git, protobuf3_7 }:
 
 let
   python = python3.override {
     packageOverrides = self: super: {
-      pyyaml = super.pyyaml.overridePythonAttrs (oldAttrs: rec {
-        version = "5.1";
-        src = oldAttrs.src.override {
-          inherit version;
-          sha256 = "436bc774ecf7c103814098159fbb84c2715d25980175292c648f2da143909f95";
-        };
-      });
       tornado = super.tornado.overridePythonAttrs (oldAttrs: rec {
         version = "5.1.1";
         src = oldAttrs.src.override {

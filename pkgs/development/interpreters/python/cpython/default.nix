@@ -10,7 +10,6 @@
 , sqlite
 , tcl ? null, tk ? null, tix ? null, libX11 ? null, xorgproto ? null, x11Support ? false
 , zlib
-, callPackage
 , self
 , CF, configd
 , python-setup-hook
@@ -221,6 +220,9 @@ in with passthru; stdenv.mkDerivation {
     # Further get rid of references. https://github.com/NixOS/nixpkgs/issues/51668
     find $out/lib/python*/config-* -type f -print -exec nuke-refs -e $out '{}' +
     find $out/lib -name '_sysconfigdata*.py*' -print -exec nuke-refs -e $out '{}' +
+
+    # Include a sitecustomize.py file
+    cp ${../sitecustomize.py} $out/${sitePackages}/sitecustomize.py
 
     # Determinism: rebuild all bytecode
     # We exclude lib2to3 because that's Python 2 code which fails

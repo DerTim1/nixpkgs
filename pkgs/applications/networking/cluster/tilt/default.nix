@@ -1,25 +1,24 @@
-{ stdenv, lib, buildGoPackage, fetchFromGitHub }:
+{ stdenv, buildGoPackage, fetchFromGitHub }:
 
 buildGoPackage rec {
-  pname   = "tilt";
-  name    = "${pname}-${version}";
+  pname = "tilt";
   /* Do not use "dev" as a version. If you do, Tilt will consider itself
      running in development environment and try to serve assets from the
      source tree, which is not there once build completes.  */
-  version = "0.8.1";
-  rev = "9ce987dd0eeb66df993f8d232b57ff3e4d380dda";
+  version = "0.9.7";
 
   src = fetchFromGitHub {
     owner  = "windmilleng";
-    repo   = "tilt";
-    rev    = "${rev}";
-    sha256 = "0ybzj2csmjc7zlkprcyy5cnh9dxgngcx3wd6n43kawi5db0lvjn4";
+    repo   = pname;
+    rev    = "v${version}";
+    sha256 = "0b7jk7iwjzdsb2wp9qx4gs9g3gi2vcqw5ilkax3gfz7wsplm0n65";
   };
 
   goPackagePath = "github.com/windmilleng/tilt";
+
   subPackages = [ "cmd/tilt" ];
 
-  buildFlagsArray = ("-ldflags=-X main.version=${version} -X main.date=2019-04-29");
+  buildFlagsArray = ("-ldflags=-X main.version=${version} -X main.date=2019-07-30");
 
   meta = with stdenv.lib; {
     description = "Local development tool to manage your developer instance when your team deploys to Kubernetes in production";

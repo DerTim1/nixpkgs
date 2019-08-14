@@ -1,6 +1,18 @@
-{ stdenv, fetchFromGitHub, pantheon, pkgconfig, meson, ninja, vala
-, gtk3, granite, wingpanel, libgee, libxml2, gobject-introspection
-, elementary-icon-theme, wrapGAppsHook }:
+{ stdenv
+, fetchFromGitHub
+, pantheon
+, pkgconfig
+, meson
+, ninja
+, vala
+, gtk3
+, granite
+, wingpanel
+, libgee
+, libxml2
+, elementary-icon-theme
+, wrapGAppsHook
+}:
 
 stdenv.mkDerivation rec {
   pname = "wingpanel-indicator-nightlight";
@@ -20,7 +32,6 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    gobject-introspection
     libxml2
     meson
     ninja

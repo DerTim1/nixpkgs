@@ -1,6 +1,21 @@
-{ stdenv, fetchFromGitHub, pantheon, pkgconfig, meson, python3
-, ninja, vala, gtk3, granite, bamf, libgtop, udev, wingpanel
-, libgee, gobject-introspection, elementary-icon-theme, wrapGAppsHook }:
+{ stdenv
+, fetchFromGitHub
+, pantheon
+, pkgconfig
+, meson
+, python3
+, ninja
+, vala
+, gtk3
+, granite
+, bamf
+, libgtop
+, udev
+, wingpanel
+, libgee
+, elementary-icon-theme
+, wrapGAppsHook
+}:
 
 stdenv.mkDerivation rec {
   pname = "wingpanel-indicator-power";
@@ -20,7 +35,6 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    gobject-introspection
     meson
     ninja
     pkgconfig

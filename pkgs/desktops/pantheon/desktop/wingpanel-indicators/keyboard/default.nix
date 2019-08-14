@@ -1,6 +1,21 @@
-{ stdenv, fetchFromGitHub, pantheon, pkgconfig, meson, ninja
-, substituteAll, vala, gtk3, granite, libxml2, wingpanel, libgee
-, xorg, libgnomekbd, gobject-introspection, elementary-icon-theme, wrapGAppsHook }:
+{ stdenv
+, fetchFromGitHub
+, pantheon
+, pkgconfig
+, meson
+, ninja
+, substituteAll
+, vala
+, gtk3
+, granite
+, libxml2
+, wingpanel
+, libgee
+, xorg
+, libgnomekbd
+, elementary-icon-theme
+, wrapGAppsHook
+}:
 
 stdenv.mkDerivation rec {
   pname = "wingpanel-indicator-keyboard";
@@ -20,7 +35,6 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    gobject-introspection
     meson
     ninja
     libxml2

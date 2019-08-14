@@ -33,6 +33,9 @@ qtModule {
 
   enableParallelBuilding = true;
 
+  # Don’t use the gn setup hook
+  dontUseGnConfigure = true;
+
   # ninja builds some components with -Wno-format,
   # which cannot be set at the same time as -Wformat-security
   hardeningDisable = [ "format" ];
@@ -197,14 +200,6 @@ EOF
     (runCommand "MacOS_SDK_sandbox.h" {} ''
       install -Dm444 "${lib.getDev darwin.apple_sdk.sdk}"/include/sandbox.h "$out"/include/sandbox.h
     '')
-
-    # For:
-    # _NSDefaultRunLoopMode
-    # _OBJC_CLASS_$_NSDate
-    # _OBJC_CLASS_$_NSDictionary
-    # _OBJC_CLASS_$_NSRunLoop
-    # _OBJC_CLASS_$_NSURL
-    darwin.cf-private
   ]);
 
   __impureHostDeps = optional stdenv.isDarwin "/usr/lib/libsandbox.1.dylib";
